@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.core.util;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ public class OptTest {
 
     @AfterEach
     public void destroy() throws Exception {
-        closeable.close();
+        this.closeable.close();
     }
 
     @ParameterizedTest
@@ -64,8 +65,8 @@ public class OptTest {
 
     public static Stream<Arguments> testOf() {
         return Stream.of(
-                Arguments.of("value", "other", 10),
-                Arguments.of(null, "other", 10)
+                Arguments.of("value", "other", RandomUtils.nextInt()),
+                Arguments.of(null, "other", RandomUtils.nextInt())
         );
     }
 

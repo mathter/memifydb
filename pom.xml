@@ -11,6 +11,9 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
+        <module>space-api</module>
+        <module>data-cbor-fasterxml</module>
+        <module>space-simple-impl</module>
     </modules>
 
     <properties>
@@ -26,6 +29,22 @@
                 <artifactId>core</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>io.github.mathter.memifydb</groupId>
+                <artifactId>data-cbor-fasterxml</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mathter.memifydb</groupId>
+                <artifactId>space-api</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mathter.memifydb</groupId>
+                <artifactId>space-simple-impl</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -63,5 +82,48 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.6.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>13.3.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.checkerframework</groupId>
+                            <artifactId>checker-qual</artifactId>
+                            <version>3.54.0</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>checkstyle/checkstyle.xml</configLocation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <propertiesLocation>checkstyle/checkstyle.properties</propertiesLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <linkXRef>false</linkXRef>
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceEncoding}</sourceDirectory>
+                        </sourceDirectories>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
