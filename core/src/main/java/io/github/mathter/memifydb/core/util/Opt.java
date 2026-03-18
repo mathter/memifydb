@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Opt is analog of the {@linkplain java.util.Optional} but contains two stats: value (including null) and empty.
