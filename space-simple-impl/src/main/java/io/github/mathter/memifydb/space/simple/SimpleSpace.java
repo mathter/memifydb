@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.space.simple;
 
-import io.github.mathter.memifydb.core.value.Value;
+import io.github.mathter.memifydb.core.data.Value;
 import io.github.mathter.memifydb.core.util.Opt;
 import io.github.mathter.memifydb.space.DifferentKeyTypeException;
 import io.github.mathter.memifydb.space.KeyValueSpace;
@@ -8,7 +8,6 @@ import io.github.mathter.memifydb.space.UnsupportedKeyException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

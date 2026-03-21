@@ -1,4 +1,4 @@
-package io.github.mathter.memifydb.core.value;
+package io.github.mathter.memifydb.core.data;
 
 /**
  * Translator java objects to {@linkplain Value}.

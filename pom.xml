@@ -11,8 +11,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
-        <module>space-api</module>
         <module>data-cbor-fasterxml</module>
+        <module>space-api</module>
         <module>space-simple-impl</module>
     </modules>
 

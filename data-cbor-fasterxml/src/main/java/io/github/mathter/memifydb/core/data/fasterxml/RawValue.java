@@ -1,7 +1,7 @@
-package io.github.mathter.memifydb.core.fasterxml;
+package io.github.mathter.memifydb.core.data.fasterxml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.mathter.memifydb.core.value.Value;
+import io.github.mathter.memifydb.core.data.Value;
 import io.github.mathter.memifydb.core.util.Opt;
 
 import java.io.IOException;

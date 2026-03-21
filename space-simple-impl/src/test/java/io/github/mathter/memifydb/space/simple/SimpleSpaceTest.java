@@ -1,9 +1,9 @@
 package io.github.mathter.memifydb.space.simple;
 
-import io.github.mathter.memifydb.core.fasterxml.FasterXmlValueFactory;
+import io.github.mathter.memifydb.core.data.fasterxml.FasterXmlValueFactory;
 import io.github.mathter.memifydb.core.util.Opt;
-import io.github.mathter.memifydb.core.value.Value;
-import io.github.mathter.memifydb.core.value.ValueFactory;
+import io.github.mathter.memifydb.core.data.Value;
+import io.github.mathter.memifydb.core.data.ValueFactory;
 import io.github.mathter.memifydb.space.KeyValueSpace;
 import io.github.mathter.memifydb.space.SpaceFactory;
 import org.apache.commons.lang3.RandomStringUtils;

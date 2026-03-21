@@ -1,4 +1,4 @@
-package io.github.mathter.memifydb.core.value;
+package io.github.mathter.memifydb.core.data;
 
 import java.util.ServiceLoader;
 

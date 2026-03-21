@@ -1,6 +1,6 @@
-package io.github.mathter.memifydb.core.fasterxml;
+package io.github.mathter.memifydb.core.data.fasterxml;
 
-import io.github.mathter.memifydb.core.value.ValueFactory;
+import io.github.mathter.memifydb.core.data.ValueFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

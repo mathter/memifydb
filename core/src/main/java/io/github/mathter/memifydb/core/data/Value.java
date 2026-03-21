@@ -1,4 +1,4 @@
-package io.github.mathter.memifydb.core.value;
+package io.github.mathter.memifydb.core.data;
 
 /**
  * This class is universal representation of any data in raw format.

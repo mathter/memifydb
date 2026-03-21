@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.space;
 
-import io.github.mathter.memifydb.core.value.Value;
+import io.github.mathter.memifydb.core.data.Value;
 import io.github.mathter.memifydb.core.util.Opt;
 
 /**

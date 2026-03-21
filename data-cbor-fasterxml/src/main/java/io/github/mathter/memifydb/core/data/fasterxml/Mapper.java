@@ -1,12 +1,12 @@
-package io.github.mathter.memifydb.core.fasterxml;
+package io.github.mathter.memifydb.core.data.fasterxml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
-import io.github.mathter.memifydb.core.value.ValueTranslator;
-import io.github.mathter.memifydb.core.value.Value;
-import io.github.mathter.memifydb.core.value.ValueDeserializer;
-import io.github.mathter.memifydb.core.value.ValueSerializer;
+import io.github.mathter.memifydb.core.data.ValueTranslator;
+import io.github.mathter.memifydb.core.data.Value;
+import io.github.mathter.memifydb.core.data.ValueDeserializer;
+import io.github.mathter.memifydb.core.data.ValueSerializer;
 
 import java.io.IOException;
 
