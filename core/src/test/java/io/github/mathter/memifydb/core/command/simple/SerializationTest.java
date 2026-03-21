@@ -4,7 +4,7 @@ import io.github.mathter.memifydb.core.command.CommandDeserializer;
 import io.github.mathter.memifydb.core.command.CommandSerializer;
 import io.github.mathter.memifydb.core.command.PutCommand;
 import io.github.mathter.memifydb.core.command.RemoveCommand;
-import io.github.mathter.memifydb.core.command.SerializationFactory;
+import io.github.mathter.memifydb.core.command.CommandSerializationFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class SerializationTest {
     @Test
     public void testPutCommand() throws IOException {
-        final SerializationFactory factory = SerializationFactory.get("simple");
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(SimpleCommandSerializationFactory.ID);
         final CommandSerializer serializer = factory.serializer();
         final CommandDeserializer deserializer = factory.deserializer();
 
@@ -35,7 +35,7 @@ public class SerializationTest {
 
     @Test
     public void testRemoveCommand() throws IOException {
-        final SerializationFactory factory = SerializationFactory.get("simple");
+        final CommandSerializationFactory factory = CommandSerializationFactory.get("simple");
         final CommandSerializer serializer = factory.serializer();
         final CommandDeserializer deserializer = factory.deserializer();
 

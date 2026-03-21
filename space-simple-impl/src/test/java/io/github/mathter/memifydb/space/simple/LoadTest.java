@@ -24,7 +24,7 @@ public final class LoadTest {
     }
 
     static void main() {
-        final Collection<CompletableFuture> completableFutures = new ArrayList<>();
+        final Collection<CompletableFuture<?>> completableFutures = new ArrayList<>();
 
         final ValueFactory valueFactory = ValueFactory.get(FasterXmlValueFactory.ID);
         final ValueTranslator translator = valueFactory.translator();

@@ -4,29 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-public abstract class SerializationFactory {
+public abstract class CommandSerializationFactory {
     public static final List<String> factories() {
         final List<String> result = new ArrayList<>();
-        final ServiceLoader<SerializationFactory> serviceLoader = ServiceLoader.load(SerializationFactory.class);
+        final ServiceLoader<CommandSerializationFactory> serviceLoader = ServiceLoader.load(CommandSerializationFactory.class);
 
-        for (SerializationFactory factory : serviceLoader) {
+        for (CommandSerializationFactory factory : serviceLoader) {
             result.add(factory.id());
         }
 
         return result;
     }
 
-    public static final SerializationFactory get(String id) {
-        final ServiceLoader<SerializationFactory> serviceLoader = ServiceLoader.load(SerializationFactory.class);
+    public static final CommandSerializationFactory get(String id) {
+        final ServiceLoader<CommandSerializationFactory> serviceLoader = ServiceLoader.load(CommandSerializationFactory.class);
 
-        for (SerializationFactory factory : serviceLoader) {
+        for (CommandSerializationFactory factory : serviceLoader) {
             if (id.equals(factory.id())) {
                 return factory;
             }
         }
 
         throw new IllegalStateException(
-                String.format("There is no %s with id='%s'", SerializationFactory.class, id)
+                String.format("There is no %s with id='%s'", CommandSerializationFactory.class, id)
         );
     }
 

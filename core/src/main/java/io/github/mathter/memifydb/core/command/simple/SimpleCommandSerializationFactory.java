@@ -2,9 +2,9 @@ package io.github.mathter.memifydb.core.command.simple;
 
 import io.github.mathter.memifydb.core.command.CommandDeserializer;
 import io.github.mathter.memifydb.core.command.CommandSerializer;
-import io.github.mathter.memifydb.core.command.SerializationFactory;
+import io.github.mathter.memifydb.core.command.CommandSerializationFactory;
 
-public class SimpleSerializationFactory extends SerializationFactory {
+public class SimpleCommandSerializationFactory extends CommandSerializationFactory {
     public static final String ID = "simple";
 
     @Override

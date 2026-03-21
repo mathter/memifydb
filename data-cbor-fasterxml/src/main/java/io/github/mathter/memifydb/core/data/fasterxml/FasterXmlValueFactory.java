@@ -6,7 +6,7 @@ import io.github.mathter.memifydb.core.data.ValueSerializer;
 import io.github.mathter.memifydb.core.data.ValueTranslator;
 
 public class FasterXmlValueFactory extends ValueFactory {
-    public static final String ID = FasterXmlValueFactory.class.getName();
+    public static final String ID = "fasterxml";
 
     private static final Mapper MAPPER = new Mapper();
 
