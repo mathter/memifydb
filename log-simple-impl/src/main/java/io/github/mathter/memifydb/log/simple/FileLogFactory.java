@@ -5,7 +5,9 @@ import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class FileLogFactory extends LogFactory {
@@ -56,17 +58,17 @@ public class FileLogFactory extends LogFactory {
         return result;
     }
 
-    private static File buildBase(Map<?, ?> properties) {
-        final File result;
+    private static Path buildBase(Map<?, ?> properties) {
+        final Path result;
         final Object property = properties.get(Const.LOG_ROOT_DIR);
 
         if (property != null) {
             if (property instanceof String string) {
-                result = new File(string);
+                result = Paths.get(string);
             } else if (property instanceof Path path) {
-                result = path.toFile();
+                result = path;
             } else if (property instanceof File file) {
-                result = file;
+                result = file.toPath();
             } else {
                 throw new IllegalStateException(
                         String.format("Illegal property '%s'", property)
@@ -78,7 +80,7 @@ public class FileLogFactory extends LogFactory {
             );
         }
 
-        if (!result.isDirectory()) {
+        if (!Files.isDirectory(result)) {
             throw new IllegalStateException(result + " is not a directory!");
         }
 

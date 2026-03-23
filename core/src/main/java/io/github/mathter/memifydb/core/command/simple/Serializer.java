@@ -8,6 +8,7 @@ import io.github.mathter.memifydb.core.util.ByteArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 class Serializer implements CommandSerializer {
     private static void write(OutputStream os, byte[] buf) throws IOException {
@@ -25,6 +26,20 @@ class Serializer implements CommandSerializer {
         return true;
     }
 
+    private ByteBuffer write(PutCommand command) {
+        final byte[] spaceName = command.getRawSpaceName();
+        final byte[] key = command.getRawKey();
+        final byte[] value = command.getRawValue();
+        final ByteBuffer buf = ByteBuffer.allocate(1 + spaceName.length + key.length + value.length);
+
+        buf.put(PutCommand.getPrefix());
+        buf.put(spaceName);
+        buf.put(key);
+        buf.put(value);
+
+        return buf;
+    }
+
     private boolean writeRemoveCommand(OutputStream os, RemoveCommand command) throws IOException {
         os.write(RemoveCommand.getPrefix());
         write(os, command.getRawSpaceName());
@@ -34,12 +49,33 @@ class Serializer implements CommandSerializer {
         return true;
     }
 
+    private ByteBuffer write(RemoveCommand command) {
+        final byte[] spaceName = command.getRawSpaceName();
+        final byte[] key = command.getRawKey();
+        final ByteBuffer buf = ByteBuffer.allocate(1 + spaceName.length + key.length);
+
+        buf.put(RemoveCommand.getPrefix());
+        buf.put(spaceName);
+        buf.put(key);
+
+        return buf;
+    }
+
     @Override
     public boolean serialize(OutputStream os, Command command) throws IOException {
         return switch (command) {
             case PutCommand cmd -> writePutCommand(os, cmd);
             case RemoveCommand cmd -> writeRemoveCommand(os, cmd);
             default -> false;
+        };
+    }
+
+    @Override
+    public ByteBuffer serialize(Command command) {
+        return switch (command) {
+            case PutCommand cmd -> write(cmd).rewind();
+            case RemoveCommand cmd -> write(cmd).rewind();
+            default -> null;
         };
     }
 }

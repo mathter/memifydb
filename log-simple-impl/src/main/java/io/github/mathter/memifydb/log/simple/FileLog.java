@@ -2,111 +2,100 @@ package io.github.mathter.memifydb.log.simple;
 
 import io.github.mathter.memifydb.core.command.Command;
 import io.github.mathter.memifydb.core.command.CommandDeserializer;
-import io.github.mathter.memifydb.core.command.CommandSerializer;
 import io.github.mathter.memifydb.core.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.core.util.ByteArray;
+import io.github.mathter.memifydb.core.command.CommandSerializer;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.Package;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.GatheringByteChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * File header:
+ * | memifydbwal | fileindex (int 4 bytes) | creation timestamp (long 8 bytes) |
+ */
 class FileLog implements Log {
+    private static final byte[] PACKAGE_SIGNATURE = new byte[]{0x0B, 0x01};
+
     private static final String FILE_PATTERN = "%s%s%s";
 
-    private final byte[] buf = new byte[8];
-
-    private final File root;
-
-    private final String fileNamePrefix;
-
-    private final String fileNamePostfix;
-
-    private final int fileMaxSize;
-
-    private final OutputStreamW os = new OutputStreamW();
+    private final Pattern pattern;
 
     private final CommandSerializer serializer;
 
     private final CommandDeserializer deserializer;
 
-    public FileLog(CommandSerializationFactory commandSerializationFactory, File root, String fileNamePrefix, String fileNamePostfix, int fileMaxSize) {
-        this.root = root;
-        this.fileNamePrefix = fileNamePrefix;
-        this.fileNamePostfix = fileNamePostfix;
-        this.fileMaxSize = fileMaxSize;
+    private final GatheringByteChannel channel;
+
+
+    public FileLog(CommandSerializationFactory commandSerializationFactory,
+                   Path root,
+                   String fileNamePrefix,
+                   String fileNamePostfix,
+                   int fileMaxSize) {
         this.serializer = commandSerializationFactory.serializer();
         this.deserializer = commandSerializationFactory.deserializer();
+        this.pattern = Pattern.compile(
+                String.format("^(%s)\\d+(%s)$", fileNamePrefix, fileNamePostfix)
+        );
+
+        try {
+            this.channel = new Channel(root, fileNamePrefix, fileNamePostfix, fileMaxSize, lastIndex(root));
+        } catch (IOException e) {
+            throw new RuntimeException("Can't create log!", e);
+        }
+    }
+
+    private int lastIndex(Path root) throws IOException {
+        return Files.list(root)
+                .filter(Files::isRegularFile)
+                .filter(path -> this.pattern.matcher(path.getFileName().toString()).matches())
+                .map(path -> {
+                    try (final ReadableByteChannel ch = FileChannel.open(path, StandardOpenOption.READ)) {
+                        return Header.read(ch);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .map(Header::getIndex)
+                .max(Comparator.comparingInt(left -> left))
+                .orElse(0);
     }
 
     @Override
     public void log(Package pack) throws IOException {
-        os.check();
-        ByteArray.writeLongRaw(this.os, System.currentTimeMillis());
-
         final List<Command> commands = pack.getCommands();
-        ByteArray.writeLongRaw(this.os, commands.size());
+        final ByteBuffer[] buffers = new ByteBuffer[1 + commands.size()];
+        buffers[0] = ByteBuffer.allocate(PACKAGE_SIGNATURE.length + 2 * Long.BYTES);
 
+        buffers[0].put(PACKAGE_SIGNATURE);
 
-        for (Command command : commands) {
-            this.serializer.serialize(this.os, command);
+        final UUID transactionId = pack.getTransactionId();
+        buffers[0].putLong(transactionId.getMostSignificantBits());
+        buffers[0].putLong(transactionId.getLeastSignificantBits());
+        buffers[0].rewind();
+
+        for (int i = 0, count = commands.size(); i < count; i++) {
+            buffers[i + 1] = this.serializer.serialize(commands.get(i));
         }
 
-        os.flush();
+        this.channel.write(buffers);
     }
 
     @Override
-    public Stream<Command> get(long fromTimestamp) {
+    public Stream<Package> get(long fromTimestamp) throws IOException {
         throw new UnsupportedOperationException();
-    }
-
-    class OutputStreamW extends OutputStream {
-        private File current;
-
-        private int currentSize = 0;
-
-        private OutputStream currentOutputStream;
-
-        private void check() throws IOException {
-            if (this.currentSize > FileLog.this.fileMaxSize) {
-                this.currentOutputStream.flush();
-                this.currentOutputStream.close();
-                this.current = null;
-                this.currentOutputStream = null;
-                this.currentSize = 0;
-                this.check();
-            } else if (this.currentOutputStream == null) {
-                final String pathName = String.format(
-                        FILE_PATTERN,
-                        FileLog.this.fileNamePrefix,
-                        System.currentTimeMillis(),
-                        FileLog.this.fileNamePostfix
-                );
-                this.current = new File(FileLog.this.root, pathName);
-                this.currentOutputStream = new FileOutputStream(this.current);
-                this.currentSize = 0;
-            }
-        }
-
-        @Override
-
-        public void write(int b) throws IOException {
-            this.currentOutputStream.write(b);
-            this.currentSize++;
-        }
-
-        @Override
-        public void close() throws IOException {
-            this.currentOutputStream.close();
-        }
-
-        @Override
-        public void flush() throws IOException {
-            this.currentOutputStream.flush();
-        }
     }
 }

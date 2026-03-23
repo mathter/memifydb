@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class FileLogFactoryTest {
@@ -46,6 +47,7 @@ public class FileLogFactoryTest {
 
         log.log(
                 new Package(
+                        UUID.randomUUID(),
                         keyValue0.stream()
                                 .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
                                 .toList()
@@ -54,6 +56,7 @@ public class FileLogFactoryTest {
 
         log.log(
                 new Package(
+                        UUID.randomUUID(),
                         keyValue1.stream()
                                 .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
                                 .toList()
