@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.log.simple;
 
+import io.github.mathter.memifydb.core.command.Command;
 import io.github.mathter.memifydb.core.command.PutCommand;
 import io.github.mathter.memifydb.core.command.simple.SimpleCommandSerializationFactory;
 import io.github.mathter.memifydb.log.Log;
@@ -32,35 +33,37 @@ public class FileLogFactoryTest {
                 .mapToObj(e -> Pair.of(RandomUtils.nextBytes(10), RandomUtils.nextBytes(100)))
                 .toList();
 
-        final LogFactory factory = LogFactory.get(FileLogFactory.ID);
+        final LogFactory factory = LogFactory.get(FileLogFactory.Const.FACTORY_ID);
         Assertions.assertNotNull(factory);
 
         final Path root = Files.createTempDirectory(Paths.get("./target"), "tmp-log");
-        final Log log = factory.get(
-                Map.of(
-                        Const.LOG_ROOT_DIR, root,
-                        Const.FILE_MAX_SIZE, 100,
-                        Const.COMMAND_SERELIZATION_FACTORY,
-                        SimpleCommandSerializationFactory.ID
-                )
-        );
-
-        log.log(
+        final Package[] packages = {
                 new Package(
                         UUID.randomUUID(),
                         keyValue0.stream()
                                 .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
-                                .toList()
-                )
-        );
-
-        log.log(
+                                .toArray(Command[]::new)
+                ),
                 new Package(
                         UUID.randomUUID(),
                         keyValue1.stream()
                                 .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
-                                .toList()
+                                .toArray(Command[]::new)
+                )
+        };
+        final Log log = factory.get(
+                Map.of(
+                        FileLogFactory.Const.PARAM_LOG_ROOT_DIR, root,
+                        FileLogFactory.Const.PARAM_FILE_MAX_SIZE, 100,
+                        FileLogFactory.Const.PARAM_COMMAND_SERELIZATION_FACTORY,
+                        SimpleCommandSerializationFactory.ID
                 )
         );
+
+        log.log(packages[0]);
+        log.log(packages[1]);
+
+        final Package[] readed = log.get(0).toArray(Package[]::new);
+        Assertions.assertArrayEquals(packages, readed);
     }
 }

@@ -9,6 +9,7 @@ import io.github.mathter.memifydb.core.util.ByteArray;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
 class Serializer implements CommandSerializer {
     private static void write(OutputStream os, byte[] buf) throws IOException {
@@ -30,11 +31,14 @@ class Serializer implements CommandSerializer {
         final byte[] spaceName = command.getRawSpaceName();
         final byte[] key = command.getRawKey();
         final byte[] value = command.getRawValue();
-        final ByteBuffer buf = ByteBuffer.allocate(1 + spaceName.length + key.length + value.length);
+        final ByteBuffer buf = ByteBuffer.allocate(1 + 4 + spaceName.length + 4 + key.length + 4 + value.length);
 
         buf.put(PutCommand.getPrefix());
+        buf.putInt(spaceName.length);
         buf.put(spaceName);
+        buf.putInt(key.length);
         buf.put(key);
+        buf.putInt(value.length);
         buf.put(value);
 
         return buf;
@@ -52,10 +56,12 @@ class Serializer implements CommandSerializer {
     private ByteBuffer write(RemoveCommand command) {
         final byte[] spaceName = command.getRawSpaceName();
         final byte[] key = command.getRawKey();
-        final ByteBuffer buf = ByteBuffer.allocate(1 + spaceName.length + key.length);
+        final ByteBuffer buf = ByteBuffer.allocate(1 + 4 + spaceName.length + 4 + key.length);
 
         buf.put(RemoveCommand.getPrefix());
+        buf.putInt(spaceName.length);
         buf.put(spaceName);
+        buf.putInt(key.length);
         buf.put(key);
 
         return buf;

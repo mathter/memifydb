@@ -2,6 +2,8 @@ package io.github.mathter.memifydb.core.command;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Command to put data in key-value space.
@@ -45,5 +47,20 @@ public class PutCommand implements Command {
 
     public byte[] getRawValue() {
         return this.rawValue;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(PREFIX, this.rawSpaceName, this.rawKey, this.rawValue);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj
+                || (obj instanceof PutCommand another
+                && Arrays.equals(this.rawSpaceName, another.rawSpaceName)
+                && Arrays.equals(this.rawKey, another.rawKey)
+                && Arrays.equals(this.rawValue, another.rawValue)
+        );
     }
 }

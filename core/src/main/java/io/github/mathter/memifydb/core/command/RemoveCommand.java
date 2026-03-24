@@ -1,6 +1,8 @@
 package io.github.mathter.memifydb.core.command;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Remove command from space.
@@ -36,5 +38,19 @@ public class RemoveCommand implements Command {
 
     public byte[] getRawKey() {
         return rawKey;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(PREFIX, this.rawSpaceName, this.rawKey);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj
+                || (obj instanceof RemoveCommand another
+                && Arrays.equals(this.rawSpaceName, another.rawSpaceName)
+                && Arrays.equals(this.rawKey, another.rawKey)
+        );
     }
 }
