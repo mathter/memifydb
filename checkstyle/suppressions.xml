@@ -5,4 +5,5 @@
 <suppressions>
     <suppress checks="MagicNumber" files="SimpleSpaceTest.java"/>
     <suppress checks="MagicNumber" files="FileLogFactoryTest.java"/>
+    <suppress checks="MagicNumber" files="SerializationTest"/>
 </suppressions>

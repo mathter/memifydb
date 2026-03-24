@@ -11,17 +11,9 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 public class FileLogFactory extends LogFactory {
-    public static final int DEFAULT_FILE_MAX_SIZE = 100_000_000;
-
-    public static final String DEFAILT_FILE_NAME_PREFIX = "fl-";
-
-    public static final String DEFAULT_FILE_NAME_POSTFIX = ".wal";
-
-    public static final String ID = "simple";
-
     @Override
     public String id() {
-        return ID;
+        return Const.FACTORY_ID;
     }
 
     @Override
@@ -37,7 +29,7 @@ public class FileLogFactory extends LogFactory {
 
     private static CommandSerializationFactory buildSerializationFactory(Map<?, ?> properties) {
         final CommandSerializationFactory result;
-        final Object property = properties.get(Const.COMMAND_SERELIZATION_FACTORY);
+        final Object property = properties.get(Const.PARAM_COMMAND_SERELIZATION_FACTORY);
 
         if (property != null) {
             if (property instanceof CommandSerializationFactory factory) {
@@ -51,7 +43,7 @@ public class FileLogFactory extends LogFactory {
             }
         } else {
             throw new IllegalStateException(
-                    String.format("There is no parameter '%s'!", Const.COMMAND_SERELIZATION_FACTORY)
+                    String.format("There is no parameter '%s'!", Const.PARAM_COMMAND_SERELIZATION_FACTORY)
             );
         }
 
@@ -60,7 +52,7 @@ public class FileLogFactory extends LogFactory {
 
     private static Path buildBase(Map<?, ?> properties) {
         final Path result;
-        final Object property = properties.get(Const.LOG_ROOT_DIR);
+        final Object property = properties.get(Const.PARAM_LOG_ROOT_DIR);
 
         if (property != null) {
             if (property instanceof String string) {
@@ -76,7 +68,7 @@ public class FileLogFactory extends LogFactory {
             }
         } else {
             throw new IllegalStateException(
-                    String.format("There is no parameter '%s'!", Const.LOG_ROOT_DIR)
+                    String.format("There is no parameter '%s'!", Const.PARAM_LOG_ROOT_DIR)
             );
         }
 
@@ -89,7 +81,7 @@ public class FileLogFactory extends LogFactory {
 
     private static String buildFileNamePrefix(Map<?, ?> properties) {
         final String result;
-        final Object property = properties.get(Const.FILE_NAME_PREFIX);
+        final Object property = properties.get(Const.PARAM_FILE_NAME_PREFIX);
 
         if (property != null) {
             if (property instanceof String string) {
@@ -100,7 +92,7 @@ public class FileLogFactory extends LogFactory {
                 );
             }
         } else {
-            result = DEFAILT_FILE_NAME_PREFIX;
+            result = Const.DEFAILT_FILE_NAME_PREFIX;
         }
 
         return result;
@@ -108,7 +100,7 @@ public class FileLogFactory extends LogFactory {
 
     private static String buildFileNamePostfix(Map<?, ?> properties) {
         final String result;
-        final Object property = properties.get(Const.FILE_NAME_POSTFIX);
+        final Object property = properties.get(Const.PARAM_FILE_NAME_POSTFIX);
 
         if (property != null) {
             if (property instanceof String string) {
@@ -119,7 +111,7 @@ public class FileLogFactory extends LogFactory {
                 );
             }
         } else {
-            result = DEFAULT_FILE_NAME_POSTFIX;
+            result = Const.DEFAULT_FILE_NAME_POSTFIX;
         }
 
         return result;
@@ -127,7 +119,7 @@ public class FileLogFactory extends LogFactory {
 
     private static int buildFileMaxSize(Map<?, ?> properties) {
         final int result;
-        final Object property = properties.get(Const.FILE_MAX_SIZE);
+        final Object property = properties.get(Const.PARAM_FILE_MAX_SIZE);
 
         if (property != null) {
             if (property instanceof String string) {
@@ -140,9 +132,29 @@ public class FileLogFactory extends LogFactory {
                 );
             }
         } else {
-            result = DEFAULT_FILE_MAX_SIZE;
+            result = Const.DEFAULT_FILE_MAX_SIZE;
         }
 
         return result;
+    }
+
+    public interface Const {
+        public static final String FACTORY_ID = "simple";
+
+        public static final String PARAM_COMMAND_SERELIZATION_FACTORY = "COMMAND_SERELIZATION_FACTORY";
+
+        public static final String PARAM_LOG_ROOT_DIR = "LOG_ROOT_DIR";
+
+        public static final String PARAM_FILE_NAME_PREFIX = "FILE_NAME_PREFIX";
+
+        public static final String PARAM_FILE_NAME_POSTFIX = "FILE_NAME_POSTFIX";
+
+        public static final String PARAM_FILE_MAX_SIZE = "FILE_MAX_SIZE";
+
+        public static final int DEFAULT_FILE_MAX_SIZE = 100_000_000;
+
+        public static final String DEFAILT_FILE_NAME_PREFIX = "fl-";
+
+        public static final String DEFAULT_FILE_NAME_POSTFIX = ".wal";
     }
 }
