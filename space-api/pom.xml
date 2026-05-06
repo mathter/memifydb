@@ -11,16 +11,14 @@
 
     <artifactId>space-api</artifactId>
 
-    <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mathter.memifydb</groupId>
+            <artifactId>transaction-api</artifactId>
         </dependency>
     </dependencies>
 

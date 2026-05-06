@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>common</artifactId>
         </dependency>
     </dependencies>
 

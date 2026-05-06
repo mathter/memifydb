@@ -1,6 +1,6 @@
 module log.simple.impl {
-    requires io.github.mathter.memifydb.core;
-    requires io.github.mathter.memifydb.log;
+    requires io.github.mathter.memifydb.common;
+    requires io.github.mathter.memifydb.log.api;
     requires org.apache.commons.lang3;
     requires java.logging;
 

@@ -2,6 +2,7 @@ package io.github.mathter.memifydb.space.simple;
 
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.space.SpaceFactory;
+import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,12 @@
 package io.github.mathter.memifydb.space.simple;
 
-import io.github.mathter.memifydb.core.data.fasterxml.FasterXmlValueFactory;
-import io.github.mathter.memifydb.core.data.Value;
-import io.github.mathter.memifydb.core.data.ValueFactory;
-import io.github.mathter.memifydb.core.data.ValueTranslator;
-import io.github.mathter.memifydb.space.KeyValueSpace;
+import io.github.mathter.memifydb.common.data.Value;
+import io.github.mathter.memifydb.common.data.ValueFactory;
+import io.github.mathter.memifydb.common.data.ValueTranslator;
+import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
+import io.github.mathter.memifydb.space.KeyValueOperations;
 import io.github.mathter.memifydb.space.SpaceFactory;
+import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -29,7 +30,7 @@ public final class LoadTest {
         final ValueFactory valueFactory = ValueFactory.get(FasterXmlValueFactory.ID);
         final ValueTranslator translator = valueFactory.translator();
 
-        final KeyValueSpace space = SpaceFactory.getInstance(SimpleSpaceFactory.ID).get(RandomStringUtils.random(5));
+        final KeyValueOperations space = SpaceFactory.getInstance(SimpleSpaceFactory.ID).get(RandomStringUtils.random(5));
 
         final List<Value> keys = LongStream.range(0, THREAD_COUNT * COUNT)
                 .map(e -> RandomUtils.nextLong())
