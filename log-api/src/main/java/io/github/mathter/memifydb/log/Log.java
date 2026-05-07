@@ -3,6 +3,9 @@ package io.github.mathter.memifydb.log;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+/**
+ *
+ */
 public interface Log extends AutoCloseable {
     public void log(Package pack) throws IOException;
 
