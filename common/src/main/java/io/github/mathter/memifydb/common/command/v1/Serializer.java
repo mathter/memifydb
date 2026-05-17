@@ -30,12 +30,41 @@ class Serializer implements CommandSerializer {
         os.write(buf);
     }
 
-    private boolean writeXaCommand(OutputStream os, XaWrapper<?> command) throws IOException {
+    private boolean write(OutputStream os, XaStartTransactionCommand command) throws IOException {
         final Xid xid = command.getXid();
         final byte[] globalTransactionId = xid.getGlobalTransactionId();
         final byte[] branchQualifier = xid.getBranchQualifier();
 
-        os.write(XaWrapper.getPrefix());
+        os.write(XaStartTransactionCommand.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+
+        return true;
+    }
+
+    private ByteBuffer write(XaStartTransactionCommand command) {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+
+        buf.put(XaStartTransactionCommand.getPrefix());
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+
+        return buf;
+    }
+
+    private boolean write(OutputStream os, XaWrapperCommand<?> command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaWrapperCommand.getPrefix());
         ByteArray.writeIntRaw(os, xid.getFormatId());
         write(os, globalTransactionId);
         write(os, branchQualifier);
@@ -44,14 +73,14 @@ class Serializer implements CommandSerializer {
         return true;
     }
 
-    private ByteBuffer write(XaWrapper<?> command) {
+    private ByteBuffer write(XaWrapperCommand<?> command) {
         final Xid xid = command.getXid();
         final byte[] globalTransactionId = xid.getGlobalTransactionId();
         final byte[] branchQualifier = xid.getBranchQualifier();
         final ByteBuffer wrapped = this.serialize(command.getCommand()).rewind();
         final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length + wrapped.remaining());
 
-        buf.put(XaWrapper.getPrefix());
+        buf.put(XaWrapperCommand.getPrefix());
         buf.putInt(xid.getFormatId());
         buf.putInt(globalTransactionId.length);
         buf.put(globalTransactionId);
@@ -62,7 +91,7 @@ class Serializer implements CommandSerializer {
         return buf;
     }
 
-    private boolean writePutCommand(OutputStream os, PutCommand command) throws IOException {
+    private boolean write(OutputStream os, PutCommand command) throws IOException {
         os.write(PutCommand.getPrefix());
         write(os, command.getRawSpaceName());
         write(os, command.getRawKey());
@@ -89,7 +118,7 @@ class Serializer implements CommandSerializer {
         return buf;
     }
 
-    private boolean writeRemoveCommand(OutputStream os, RemoveCommand command) throws IOException {
+    private boolean write(OutputStream os, RemoveCommand command) throws IOException {
         os.write(RemoveCommand.getPrefix());
         write(os, command.getRawSpaceName());
         write(os, command.getRawKey());
@@ -115,20 +144,22 @@ class Serializer implements CommandSerializer {
     @Override
     public boolean serialize(OutputStream os, Command command) throws IOException {
         return switch (command) {
-            case XaWrapper<?> cmd -> writeXaCommand(os, cmd);
-            case PutCommand cmd -> writePutCommand(os, cmd);
-            case RemoveCommand cmd -> writeRemoveCommand(os, cmd);
+            case XaStartTransactionCommand cmd -> write(os, cmd);
+            case XaWrapperCommand<?> cmd -> write(os, cmd);
+            case PutCommand cmd -> write(os, cmd);
+            case RemoveCommand cmd -> write(os, cmd);
             default -> false;
         };
     }
 
     @Override
     public ByteBuffer serialize(Command command) {
-        return switch (command) {
-            case XaWrapper<?> cmd -> write(cmd);
+        return (switch (command) {
+            case XaStartTransactionCommand cmd -> write(cmd);
+            case XaWrapperCommand<?> cmd -> write(cmd).rewind();
             case PutCommand cmd -> write(cmd).rewind();
             case RemoveCommand cmd -> write(cmd).rewind();
             default -> null;
-        };
+        }).rewind();
     }
 }

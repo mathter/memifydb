@@ -5,14 +5,14 @@ import io.github.mathter.memifydb.common.command.xa.XaCommand;
 
 import javax.transaction.xa.Xid;
 
-public class XaWrapper<C extends Command> implements XaCommand {
+public class XaWrapperCommand<C extends Command> implements XaCommand {
     private static final byte[] PREFIX = {0x0A, 0x00};
 
     private final Xid xid;
 
     private final C command;
 
-    public XaWrapper(Xid xid, C command) {
+    public XaWrapperCommand(Xid xid, C command) {
         this.xid = xid;
         this.command = command;
     }

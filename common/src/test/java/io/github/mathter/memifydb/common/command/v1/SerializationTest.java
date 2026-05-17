@@ -46,14 +46,14 @@ public class SerializationTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
         final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
-        final XaWrapper<?> command = new XaWrapper<>(xid, wrappedCommand);
+        final XaWrapperCommand<?> command = new XaWrapperCommand<>(xid, wrappedCommand);
 
         serializer.serialize(baos, command);
 
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         final ReadableByteChannel channel = new InputStreamChannel(bais);
 
-        final XaWrapper<?> deserializedCommand = deserializer.deserialize(channel);
+        final XaWrapperCommand<?> deserializedCommand = deserializer.deserialize(channel);
         Assertions.assertNotNull(deserializedCommand);
         Assertions.assertEquals(xid, deserializedCommand.getXid());
 
@@ -74,11 +74,11 @@ public class SerializationTest {
         final OutputStreamChannel channel = new OutputStreamChannel(baos);
         final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
         final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
-        final XaWrapper<?> command = new XaWrapper<>(xid, wrappedCommand);
+        final XaWrapperCommand<?> command = new XaWrapperCommand<>(xid, wrappedCommand);
 
         channel.write(serializer.serialize(command).rewind());
 
-        final XaWrapper<?> deserializedCommand = deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
+        final XaWrapperCommand<?> deserializedCommand = deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
         Assertions.assertNotNull(deserializedCommand);
         Assertions.assertEquals(xid, deserializedCommand.getXid());
 

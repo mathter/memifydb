@@ -34,13 +34,15 @@ class Deserializer implements CommandDeserializer {
 
     static {
         map = Map.of(
-                new Key(XaWrapper.getPrefix()), Deserializer::readXaWrapper,
+                new Key(XaStartTransactionCommand.getPrefix()), Deserializer::readXaStartTransactionCommand,
+                new Key(XaWrapperCommand.getPrefix()), Deserializer::readXaWrapperCommand,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
         );
 
         channelMap = Map.of(
-                new Key(XaWrapper.getPrefix()), Deserializer::readXaWrapper,
+                new Key(XaStartTransactionCommand.getPrefix()), Deserializer::readXaStartTransactionCommand,
+                new Key(XaWrapperCommand.getPrefix()), Deserializer::readXaWrapperCommand,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
         );
@@ -85,23 +87,42 @@ class Deserializer implements CommandDeserializer {
         return result;
     }
 
-    private XaWrapper<?> readXaWrapper(InputStream is) throws IOException {
-        return new XaWrapper<>(
+    private XaStartTransactionCommand readXaStartTransactionCommand(InputStream is) throws IOException {
+        return new XaStartTransactionCommand(
+                Xid.of(ByteArray.readIntRaw(is), read(is), read(is))
+        );
+    }
+
+    private XaStartTransactionCommand readXaStartTransactionCommand(ReadableByteChannel channel) throws IOException {
+        final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
+
+        if (channel.read(xidFormatIdBuffer) == 4) {
+            xidFormatIdBuffer.rewind();
+            return new XaStartTransactionCommand(
+                    Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
+            );
+        } else {
+            throw new IOException("There is no reader for command XaStartTransactionCommand!");
+        }
+    }
+
+    private XaWrapperCommand<?> readXaWrapperCommand(InputStream is) throws IOException {
+        return new XaWrapperCommand<>(
                 Xid.of(ByteArray.readIntRaw(is), read(is), read(is)),
                 this.deserialize(is)
         );
     }
 
-    private XaWrapper<?> readXaWrapper(ReadableByteChannel channel) throws IOException {
+    private XaWrapperCommand<?> readXaWrapperCommand(ReadableByteChannel channel) throws IOException {
         final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
         if (channel.read(xidFormatIdBuffer) == 4) {
             xidFormatIdBuffer.rewind();
-            return new XaWrapper<>(
+            return new XaWrapperCommand<>(
                     Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel)),
                     this.deserialize(channel)
             );
         } else {
-            throw new IOException("There is no reader for command XA!");
+            throw new IOException("There is no reader for command XaWrapperCommand!");
         }
     }
 
