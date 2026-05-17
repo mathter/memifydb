@@ -35,6 +35,10 @@ class Deserializer implements CommandDeserializer {
     static {
         map = Map.of(
                 new Key(XaStartTransactionCommand.getPrefix()), Deserializer::readXaStartTransactionCommand,
+                new Key(XaEndTransactionCommand.getPrefix()), Deserializer::readXaEndTransactionCommand,
+                new Key(XaPrepareTransactionCommand.getPrefix()), Deserializer::readXaPrepareTransactionCommand,
+                new Key(XaCommitTransactionCommand.getPrefix()), Deserializer::readXaCommitTransactionCommand,
+                new Key(XaRollbackTransactionCommand.getPrefix()), Deserializer::readXaRollbackTransactionCommand,
                 new Key(XaWrapperCommand.getPrefix()), Deserializer::readXaWrapperCommand,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
@@ -42,6 +46,10 @@ class Deserializer implements CommandDeserializer {
 
         channelMap = Map.of(
                 new Key(XaStartTransactionCommand.getPrefix()), Deserializer::readXaStartTransactionCommand,
+                new Key(XaEndTransactionCommand.getPrefix()), Deserializer::readXaEndTransactionCommand,
+                new Key(XaPrepareTransactionCommand.getPrefix()), Deserializer::readXaPrepareTransactionCommand,
+                new Key(XaCommitTransactionCommand.getPrefix()), Deserializer::readXaCommitTransactionCommand,
+                new Key(XaRollbackTransactionCommand.getPrefix()), Deserializer::readXaRollbackTransactionCommand,
                 new Key(XaWrapperCommand.getPrefix()), Deserializer::readXaWrapperCommand,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
@@ -99,6 +107,82 @@ class Deserializer implements CommandDeserializer {
         if (channel.read(xidFormatIdBuffer) == 4) {
             xidFormatIdBuffer.rewind();
             return new XaStartTransactionCommand(
+                    Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
+            );
+        } else {
+            throw new IOException("There is no reader for command XaStartTransactionCommand!");
+        }
+    }
+
+    private XaEndTransactionCommand readXaEndTransactionCommand(InputStream is) throws IOException {
+        return new XaEndTransactionCommand(
+                Xid.of(ByteArray.readIntRaw(is), read(is), read(is))
+        );
+    }
+
+    private XaEndTransactionCommand readXaEndTransactionCommand(ReadableByteChannel channel) throws IOException {
+        final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
+
+        if (channel.read(xidFormatIdBuffer) == 4) {
+            xidFormatIdBuffer.rewind();
+            return new XaEndTransactionCommand(
+                    Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
+            );
+        } else {
+            throw new IOException("There is no reader for command XaStartTransactionCommand!");
+        }
+    }
+
+    private XaPrepareTransactionCommand readXaPrepareTransactionCommand(InputStream is) throws IOException {
+        return new XaPrepareTransactionCommand(
+                Xid.of(ByteArray.readIntRaw(is), read(is), read(is))
+        );
+    }
+
+    private XaPrepareTransactionCommand readXaPrepareTransactionCommand(ReadableByteChannel channel) throws IOException {
+        final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
+
+        if (channel.read(xidFormatIdBuffer) == 4) {
+            xidFormatIdBuffer.rewind();
+            return new XaPrepareTransactionCommand(
+                    Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
+            );
+        } else {
+            throw new IOException("There is no reader for command XaStartTransactionCommand!");
+        }
+    }
+
+    private XaCommitTransactionCommand readXaCommitTransactionCommand(InputStream is) throws IOException {
+        return new XaCommitTransactionCommand(
+                Xid.of(ByteArray.readIntRaw(is), read(is), read(is))
+        );
+    }
+
+    private XaCommitTransactionCommand readXaCommitTransactionCommand(ReadableByteChannel channel) throws IOException {
+        final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
+
+        if (channel.read(xidFormatIdBuffer) == 4) {
+            xidFormatIdBuffer.rewind();
+            return new XaCommitTransactionCommand(
+                    Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
+            );
+        } else {
+            throw new IOException("There is no reader for command XaStartTransactionCommand!");
+        }
+    }
+
+    private XaRollbackTransactionCommand readXaRollbackTransactionCommand(InputStream is) throws IOException {
+        return new XaRollbackTransactionCommand(
+                Xid.of(ByteArray.readIntRaw(is), read(is), read(is))
+        );
+    }
+
+    private XaRollbackTransactionCommand readXaRollbackTransactionCommand(ReadableByteChannel channel) throws IOException {
+        final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
+
+        if (channel.read(xidFormatIdBuffer) == 4) {
+            xidFormatIdBuffer.rewind();
+            return new XaRollbackTransactionCommand(
                     Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel))
             );
         } else {

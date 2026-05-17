@@ -44,12 +44,133 @@ class Serializer implements CommandSerializer {
     }
 
     private ByteBuffer write(XaStartTransactionCommand command) {
+        final byte[] prefix = XaStartTransactionCommand.getPrefix();
         final Xid xid = command.getXid();
         final byte[] globalTransactionId = xid.getGlobalTransactionId();
         final byte[] branchQualifier = xid.getBranchQualifier();
-        final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+        final ByteBuffer buf = ByteBuffer.allocate(prefix.length + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
 
-        buf.put(XaStartTransactionCommand.getPrefix());
+        buf.put(prefix);
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+
+        return buf;
+    }
+
+    private boolean write(OutputStream os, XaEndTransactionCommand command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaEndTransactionCommand.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+
+        return true;
+    }
+
+    private ByteBuffer write(XaEndTransactionCommand command) {
+        final byte[] prefix = XaEndTransactionCommand.getPrefix();
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer buf = ByteBuffer.allocate(prefix.length + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+
+        buf.put(prefix);
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+
+        return buf;
+    }
+
+    private boolean write(OutputStream os, XaPrepareTransactionCommand command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaPrepareTransactionCommand.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+
+        return true;
+    }
+
+    private ByteBuffer write(XaPrepareTransactionCommand command) {
+        final byte[] prefix = XaPrepareTransactionCommand.getPrefix();
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer buf = ByteBuffer.allocate(prefix.length + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+
+        buf.put(prefix);
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+
+        return buf;
+    }
+
+    private boolean write(OutputStream os, XaCommitTransactionCommand command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaCommitTransactionCommand.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+
+        return true;
+    }
+
+    private ByteBuffer write(XaCommitTransactionCommand command) {
+        final byte[] prefix = XaCommitTransactionCommand.getPrefix();
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer buf = ByteBuffer.allocate(prefix.length + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+
+        buf.put(prefix);
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+
+        return buf;
+    }
+
+    private boolean write(OutputStream os, XaRollbackTransactionCommand command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaRollbackTransactionCommand.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+
+        return true;
+    }
+
+    private ByteBuffer write(XaRollbackTransactionCommand command) {
+        final byte[] prefix = XaRollbackTransactionCommand.getPrefix();
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer buf = ByteBuffer.allocate(prefix.length + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length);
+
+        buf.put(prefix);
         buf.putInt(xid.getFormatId());
         buf.putInt(globalTransactionId.length);
         buf.put(globalTransactionId);
@@ -145,6 +266,10 @@ class Serializer implements CommandSerializer {
     public boolean serialize(OutputStream os, Command command) throws IOException {
         return switch (command) {
             case XaStartTransactionCommand cmd -> write(os, cmd);
+            case XaEndTransactionCommand cmd -> write(os, cmd);
+            case XaPrepareTransactionCommand cmd -> write(os, cmd);
+            case XaCommitTransactionCommand cmd -> write(os, cmd);
+            case XaRollbackTransactionCommand cmd -> write(os, cmd);
             case XaWrapperCommand<?> cmd -> write(os, cmd);
             case PutCommand cmd -> write(os, cmd);
             case RemoveCommand cmd -> write(os, cmd);
@@ -156,6 +281,10 @@ class Serializer implements CommandSerializer {
     public ByteBuffer serialize(Command command) {
         return (switch (command) {
             case XaStartTransactionCommand cmd -> write(cmd);
+            case XaEndTransactionCommand cmd -> write(cmd);
+            case XaPrepareTransactionCommand cmd -> write(cmd);
+            case XaCommitTransactionCommand cmd -> write(cmd);
+            case XaRollbackTransactionCommand cmd -> write(cmd);
             case XaWrapperCommand<?> cmd -> write(cmd).rewind();
             case PutCommand cmd -> write(cmd).rewind();
             case RemoveCommand cmd -> write(cmd).rewind();
