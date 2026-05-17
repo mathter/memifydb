@@ -1,8 +1,8 @@
 package io.github.mathter.memifydb.log.simple;
 
 import io.github.mathter.memifydb.common.command.Command;
-import io.github.mathter.memifydb.common.command.PutCommand;
-import io.github.mathter.memifydb.common.command.simple.SimpleCommandSerializationFactory;
+import io.github.mathter.memifydb.common.command.v1.PutCommand;
+import io.github.mathter.memifydb.common.command.v1.CommandSerializationFactoryV1;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 import io.github.mathter.memifydb.log.Package;
@@ -71,7 +71,7 @@ public class FileLogFactoryTest {
                         FileLogFactory.Const.PARAM_LOG_ROOT_DIR, root,
                         FileLogFactory.Const.PARAM_FILE_MAX_SIZE, 100,
                         FileLogFactory.Const.PARAM_COMMAND_SERELIZATION_FACTORY,
-                        SimpleCommandSerializationFactory.ID
+                        CommandSerializationFactoryV1.ID
                 )
         );
 

@@ -1,11 +1,11 @@
-package io.github.mathter.memifydb.common.command.simple;
+package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.Command;
 import io.github.mathter.memifydb.common.command.CommandSerializer;
-import io.github.mathter.memifydb.common.command.PutCommand;
-import io.github.mathter.memifydb.common.command.RemoveCommand;
+import io.github.mathter.memifydb.common.command.xa.XaWrapper;
 import io.github.mathter.memifydb.common.util.ByteArray;
 
+import javax.transaction.xa.Xid;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -31,6 +31,38 @@ class Serializer implements CommandSerializer {
         os.write(buf);
     }
 
+    private boolean writeXaCommand(OutputStream os, XaWrapper<?> command) throws IOException {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+
+        os.write(XaWrapperImpl.getPrefix());
+        ByteArray.writeIntRaw(os, xid.getFormatId());
+        write(os, globalTransactionId);
+        write(os, branchQualifier);
+        this.serialize(os, command.getCommand());
+
+        return true;
+    }
+
+    private ByteBuffer write(XaWrapper<?> command) {
+        final Xid xid = command.getXid();
+        final byte[] globalTransactionId = xid.getGlobalTransactionId();
+        final byte[] branchQualifier = xid.getBranchQualifier();
+        final ByteBuffer wrapped = this.serialize(command.getCommand()).rewind();
+        final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length + wrapped.remaining());
+
+        buf.put(XaWrapperImpl.getPrefix());
+        buf.putInt(xid.getFormatId());
+        buf.putInt(globalTransactionId.length);
+        buf.put(globalTransactionId);
+        buf.putInt(branchQualifier.length);
+        buf.put(branchQualifier);
+        buf.put(wrapped);
+
+        return buf;
+    }
+
     private boolean writePutCommand(OutputStream os, PutCommand command) throws IOException {
         os.write(PutCommand.getPrefix());
         write(os, command.getRawSpaceName());
@@ -45,7 +77,7 @@ class Serializer implements CommandSerializer {
         final byte[] spaceName = command.getRawSpaceName();
         final byte[] key = command.getRawKey();
         final byte[] value = command.getRawValue();
-        final ByteBuffer buf = ByteBuffer.allocate(1 + 4 + spaceName.length + 4 + key.length + 4 + value.length);
+        final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + spaceName.length + 4 + key.length + 4 + value.length);
 
         buf.put(PutCommand.getPrefix());
         buf.putInt(spaceName.length);
@@ -70,7 +102,7 @@ class Serializer implements CommandSerializer {
     private ByteBuffer write(RemoveCommand command) {
         final byte[] spaceName = command.getRawSpaceName();
         final byte[] key = command.getRawKey();
-        final ByteBuffer buf = ByteBuffer.allocate(1 + 4 + spaceName.length + 4 + key.length);
+        final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + spaceName.length + 4 + key.length);
 
         buf.put(RemoveCommand.getPrefix());
         buf.putInt(spaceName.length);
@@ -84,6 +116,7 @@ class Serializer implements CommandSerializer {
     @Override
     public boolean serialize(OutputStream os, Command command) throws IOException {
         return switch (command) {
+            case XaWrapper<?> cmd -> writeXaCommand(os, cmd);
             case PutCommand cmd -> writePutCommand(os, cmd);
             case RemoveCommand cmd -> writeRemoveCommand(os, cmd);
             default -> false;
@@ -93,6 +126,7 @@ class Serializer implements CommandSerializer {
     @Override
     public ByteBuffer serialize(Command command) {
         return switch (command) {
+            case XaWrapper<?> cmd -> write(cmd);
             case PutCommand cmd -> write(cmd).rewind();
             case RemoveCommand cmd -> write(cmd).rewind();
             default -> null;

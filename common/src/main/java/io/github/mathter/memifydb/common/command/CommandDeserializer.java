@@ -20,7 +20,7 @@ import java.nio.channels.ReadableByteChannel;
  * limitations under the License.
  */
 public interface CommandDeserializer {
-    public Command deserialize(InputStream is) throws IOException;
+    public <C extends Command> C deserialize(InputStream is) throws IOException;
 
-    public Command deserialize(ReadableByteChannel channel) throws IOException;
+    public <C extends Command> C deserialize(ReadableByteChannel channel) throws IOException;
 }

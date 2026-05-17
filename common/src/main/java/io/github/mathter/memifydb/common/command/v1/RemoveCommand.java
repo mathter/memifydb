@@ -1,4 +1,6 @@
-package io.github.mathter.memifydb.common.command;
+package io.github.mathter.memifydb.common.command.v1;
+
+import io.github.mathter.memifydb.common.command.Command;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -22,7 +24,7 @@ import java.util.Objects;
  * Remove command from space.
  */
 public class RemoveCommand implements Command {
-    private static final byte PREFIX = 0x0B;
+    private static final byte[] PREFIX = {0x01, 0x0B};
 
     private final byte[] rawSpaceName;
 
@@ -38,7 +40,7 @@ public class RemoveCommand implements Command {
         this.rawKey = rawKey;
     }
 
-    public static byte getPrefix() {
+    public static byte[] getPrefix() {
         return PREFIX;
     }
 

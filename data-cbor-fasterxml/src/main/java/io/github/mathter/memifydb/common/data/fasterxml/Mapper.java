@@ -1,12 +1,12 @@
 package io.github.mathter.memifydb.common.data.fasterxml;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import io.github.mathter.memifydb.common.data.Value;
 import io.github.mathter.memifydb.common.data.ValueDeserializer;
 import io.github.mathter.memifydb.common.data.ValueSerializer;
 import io.github.mathter.memifydb.common.data.ValueTranslator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.cbor.CBORMapper;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ class Mapper implements ValueSerializer, ValueDeserializer, ValueTranslator {
     public <T> Value from(T object) {
         try {
             return this.deserialize(this.mapper.writeValueAsBytes(object));
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException(object + " can't be represented as Value!", e);
         }
     }
@@ -42,7 +42,7 @@ class Mapper implements ValueSerializer, ValueDeserializer, ValueTranslator {
         if (value instanceof RawValue rawValue) {
             try {
                 return this.mapper.readValue(rawValue.getRaw(), clazz);
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 throw new IllegalStateException("Can't parse!", e);
             }
         } else {

@@ -1,8 +1,9 @@
 package io.github.mathter.memifydb.common.data.fasterxml;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mathter.memifydb.common.data.Value;
 import io.github.mathter.memifydb.common.util.Opt;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -64,7 +65,7 @@ class RawValue implements Value {
 
         try {
             result = (T) this.mapper.readValue(this.raw, Object.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new IllegalStateException("Can't parse data!", e);
         }
 

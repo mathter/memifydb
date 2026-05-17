@@ -20,12 +20,6 @@
             <groupId>io.github.mathter.memifydb</groupId>
             <artifactId>space-api</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>data-cbor-fasterxml</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

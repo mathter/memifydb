@@ -1,10 +1,12 @@
-package io.github.mathter.memifydb.common.command.simple;
+package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.CommandDeserializer;
 import io.github.mathter.memifydb.common.command.CommandSerializationFactory;
 import io.github.mathter.memifydb.common.command.CommandSerializer;
-import io.github.mathter.memifydb.common.command.PutCommand;
-import io.github.mathter.memifydb.common.command.RemoveCommand;
+import io.github.mathter.memifydb.common.command.xa.XaWrapper;
+import io.github.mathter.memifydb.common.util.nio.InputStreamChannel;
+import io.github.mathter.memifydb.common.util.nio.OutputStreamChannel;
+import io.github.mathter.memifydb.common.xa.Xid;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -36,8 +39,60 @@ import java.nio.file.StandardOpenOption;
  */
 public class SerializationTest {
     @Test
+    public void testXaWrapped() throws IOException {
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
+        final CommandSerializer serializer = factory.serializer();
+        final CommandDeserializer deserializer = factory.deserializer();
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
+        final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
+        final XaWrapper<?> command = new XaWrapperImpl<>(xid, wrappedCommand);
+
+        serializer.serialize(baos, command);
+
+        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        final ReadableByteChannel channel = new InputStreamChannel(bais);
+
+        final XaWrapper<?> deserializedCommand = deserializer.deserialize(channel);
+        Assertions.assertNotNull(deserializedCommand);
+        Assertions.assertEquals(xid, deserializedCommand.getXid());
+
+        final PutCommand deserializedWrappedCommand = (PutCommand) deserializedCommand.getCommand();
+        Assertions.assertNotNull(deserializedWrappedCommand);
+        Assertions.assertEquals(wrappedCommand.getSpaceName(), deserializedWrappedCommand.getSpaceName());
+        Assertions.assertArrayEquals(wrappedCommand.getRawKey(), deserializedWrappedCommand.getRawKey());
+        Assertions.assertArrayEquals(wrappedCommand.getRawValue(), deserializedWrappedCommand.getRawValue());
+    }
+
+    @Test
+    public void testXaWrappedChannel() throws IOException {
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
+        final CommandSerializer serializer = factory.serializer();
+        final CommandDeserializer deserializer = factory.deserializer();
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final OutputStreamChannel channel = new OutputStreamChannel(baos);
+        final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
+        final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
+        final XaWrapper<?> command = new XaWrapperImpl<>(xid, wrappedCommand);
+
+        channel.write(serializer.serialize(command).rewind());
+
+        final XaWrapper<?> deserializedCommand = deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
+        Assertions.assertNotNull(deserializedCommand);
+        Assertions.assertEquals(xid, deserializedCommand.getXid());
+
+        final PutCommand deserializedWrappedCommand = (PutCommand) deserializedCommand.getCommand();
+        Assertions.assertNotNull(deserializedWrappedCommand);
+        Assertions.assertEquals(wrappedCommand.getSpaceName(), deserializedWrappedCommand.getSpaceName());
+        Assertions.assertArrayEquals(wrappedCommand.getRawKey(), deserializedWrappedCommand.getRawKey());
+        Assertions.assertArrayEquals(wrappedCommand.getRawValue(), deserializedWrappedCommand.getRawValue());
+    }
+
+    @Test
     public void testPutCommand() throws IOException {
-        final CommandSerializationFactory factory = CommandSerializationFactory.get(SimpleCommandSerializationFactory.ID);
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
         final CommandSerializer serializer = factory.serializer();
         final CommandDeserializer deserializer = factory.deserializer();
 
@@ -46,7 +101,7 @@ public class SerializationTest {
 
         serializer.serialize(baos, command);
 
-        final PutCommand deserializedCommand = (PutCommand) deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
+        final PutCommand deserializedCommand = deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
         Assertions.assertNotNull(deserializedCommand);
         Assertions.assertEquals(command.getSpaceName(), deserializedCommand.getSpaceName());
         Assertions.assertArrayEquals(command.getRawKey(), deserializedCommand.getRawKey());
@@ -55,7 +110,7 @@ public class SerializationTest {
 
     @Test
     public void testPutCommandChannel() throws IOException {
-        final CommandSerializationFactory factory = CommandSerializationFactory.get(SimpleCommandSerializationFactory.ID);
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
         final CommandSerializer serializer = factory.serializer();
         final CommandDeserializer deserializer = factory.deserializer();
 
@@ -69,7 +124,7 @@ public class SerializationTest {
 
         final PutCommand deserializedCommand;
         try (final FileChannel ch = FileChannel.open(path, StandardOpenOption.READ)) {
-            deserializedCommand = (PutCommand) deserializer.deserialize(ch);
+            deserializedCommand = deserializer.deserialize(ch);
         }
 
         Assertions.assertNotNull(deserializedCommand);
@@ -89,7 +144,7 @@ public class SerializationTest {
 
         serializer.serialize(baos, command);
 
-        final RemoveCommand deserializedCommand = (RemoveCommand) deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
+        final RemoveCommand deserializedCommand = deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
         Assertions.assertNotNull(deserializedCommand);
         Assertions.assertEquals(command.getSpaceName(), deserializedCommand.getSpaceName());
         Assertions.assertArrayEquals(command.getRawKey(), deserializedCommand.getRawKey());
@@ -97,7 +152,7 @@ public class SerializationTest {
 
     @Test
     public void testRemoveCommandChannel() throws IOException {
-        final CommandSerializationFactory factory = CommandSerializationFactory.get(SimpleCommandSerializationFactory.ID);
+        final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
         final CommandSerializer serializer = factory.serializer();
         final CommandDeserializer deserializer = factory.deserializer();
 
@@ -111,7 +166,7 @@ public class SerializationTest {
 
         final RemoveCommand deserializedCommand;
         try (final FileChannel ch = FileChannel.open(path, StandardOpenOption.READ)) {
-            deserializedCommand = (RemoveCommand) deserializer.deserialize(ch);
+            deserializedCommand = deserializer.deserialize(ch);
         }
 
         Assertions.assertNotNull(deserializedCommand);

@@ -16,9 +16,9 @@ package io.github.mathter.memifydb.space.simple;
  * limitations under the License.
  */
 public interface Const {
-    public static final String PROPERTY_ID = "ID";
+    public static final String PROPERTY_ID = "id";
 
-    public static final String PROPERTY_TRANSACTION_TIMEOUT = "TRANSACTION_TIMEOUT";
+    public static final String PROPERTY_TRANSACTION_TIMEOUT = "transaction-timeout";
 
     public static final long DEFAULT_TRANSACTION_TIMEOUT = 10;
 }

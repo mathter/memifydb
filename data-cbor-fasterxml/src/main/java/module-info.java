@@ -1,7 +1,6 @@
 module io.github.mathter.memifydb.core.data.fasterxml {
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.cbor;
+    requires tools.jackson.dataformat.cbor;
+    requires tools.jackson.core;
 
     requires transitive io.github.mathter.memifydb.common;
 

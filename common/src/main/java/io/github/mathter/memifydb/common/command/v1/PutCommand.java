@@ -1,4 +1,6 @@
-package io.github.mathter.memifydb.common.command;
+package io.github.mathter.memifydb.common.command.v1;
+
+import io.github.mathter.memifydb.common.command.Command;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -22,7 +24,7 @@ import java.util.Objects;
  * Command to put data in key-value space.
  */
 public class PutCommand implements Command {
-    private static final byte PREFIX = 0x0A;
+    private static final byte[] PREFIX = {0x01, 0x0A};
 
     private final byte[] rawSpaceName;
 
@@ -42,7 +44,7 @@ public class PutCommand implements Command {
         this.rawValue = rawValue;
     }
 
-    public static byte getPrefix() {
+    public static byte[] getPrefix() {
         return PREFIX;
     }
 

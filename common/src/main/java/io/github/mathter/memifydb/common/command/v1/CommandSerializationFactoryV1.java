@@ -1,4 +1,4 @@
-package io.github.mathter.memifydb.common.command.simple;
+package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.CommandDeserializer;
 import io.github.mathter.memifydb.common.command.CommandSerializationFactory;
@@ -19,7 +19,7 @@ import io.github.mathter.memifydb.common.command.CommandSerializer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class SimpleCommandSerializationFactory extends CommandSerializationFactory {
+public class CommandSerializationFactoryV1 extends CommandSerializationFactory {
     public static final String ID = "simple";
 
     @Override
