@@ -13,11 +13,12 @@
         <module>common</module>
         <module>data-cbor-fasterxml</module>
         <module>space-api</module>
-        <module>space-simple-impl</module>
+        <module>space-simple</module>
         <module>log-api</module>
-        <module>log-simple-impl</module>
+        <module>log-simple</module>
         <module>transaction-api</module>
         <module>universe-api</module>
+        <module>universe-simple</module>
     </modules>
 
     <properties>
@@ -50,7 +51,17 @@
             </dependency>
             <dependency>
                 <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>space-simple-impl</artifactId>
+                <artifactId>space-simple</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mathter.memifydb</groupId>
+                <artifactId>universe-api</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.mathter.memifydb</groupId>
+                <artifactId>universe-simple</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -60,7 +71,7 @@
             </dependency>
             <dependency>
                 <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>log-simple-impl</artifactId>
+                <artifactId>log-simple</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>

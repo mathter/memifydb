@@ -9,16 +9,17 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>space-simple-impl</artifactId>
+    <artifactId>log-simple</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>log-api</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>space-api</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -36,10 +37,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.github.mathter.memifydb</groupId>
-            <artifactId>data-cbor-fasterxml</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -50,4 +47,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
