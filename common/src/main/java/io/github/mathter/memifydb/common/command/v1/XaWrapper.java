@@ -1,18 +1,18 @@
 package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.Command;
-import io.github.mathter.memifydb.common.command.xa.XaWrapper;
+import io.github.mathter.memifydb.common.command.xa.XaCommand;
 
 import javax.transaction.xa.Xid;
 
-public class XaWrapperImpl<C extends Command> implements XaWrapper<C> {
+public class XaWrapper<C extends Command> implements XaCommand {
     private static final byte[] PREFIX = {0x0A, 0x00};
 
     private final Xid xid;
 
     private final C command;
 
-    public XaWrapperImpl(Xid xid, C command) {
+    public XaWrapper(Xid xid, C command) {
         this.xid = xid;
         this.command = command;
     }
@@ -26,7 +26,6 @@ public class XaWrapperImpl<C extends Command> implements XaWrapper<C> {
         return this.xid;
     }
 
-    @Override
     public C getCommand() {
         return this.command;
     }

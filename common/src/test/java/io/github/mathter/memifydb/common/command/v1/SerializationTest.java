@@ -3,7 +3,6 @@ package io.github.mathter.memifydb.common.command.v1;
 import io.github.mathter.memifydb.common.command.CommandDeserializer;
 import io.github.mathter.memifydb.common.command.CommandSerializationFactory;
 import io.github.mathter.memifydb.common.command.CommandSerializer;
-import io.github.mathter.memifydb.common.command.xa.XaWrapper;
 import io.github.mathter.memifydb.common.util.nio.InputStreamChannel;
 import io.github.mathter.memifydb.common.util.nio.OutputStreamChannel;
 import io.github.mathter.memifydb.common.xa.Xid;
@@ -47,7 +46,7 @@ public class SerializationTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
         final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
-        final XaWrapper<?> command = new XaWrapperImpl<>(xid, wrappedCommand);
+        final XaWrapper<?> command = new XaWrapper<>(xid, wrappedCommand);
 
         serializer.serialize(baos, command);
 
@@ -75,7 +74,7 @@ public class SerializationTest {
         final OutputStreamChannel channel = new OutputStreamChannel(baos);
         final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
         final PutCommand wrappedCommand = new PutCommand(RandomStringUtils.random(10), RandomUtils.nextBytes(10), RandomUtils.nextBytes(100));
-        final XaWrapper<?> command = new XaWrapperImpl<>(xid, wrappedCommand);
+        final XaWrapper<?> command = new XaWrapper<>(xid, wrappedCommand);
 
         channel.write(serializer.serialize(command).rewind());
 

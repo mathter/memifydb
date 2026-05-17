@@ -2,7 +2,6 @@ package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.Command;
 import io.github.mathter.memifydb.common.command.CommandSerializer;
-import io.github.mathter.memifydb.common.command.xa.XaWrapper;
 import io.github.mathter.memifydb.common.util.ByteArray;
 
 import javax.transaction.xa.Xid;
@@ -36,7 +35,7 @@ class Serializer implements CommandSerializer {
         final byte[] globalTransactionId = xid.getGlobalTransactionId();
         final byte[] branchQualifier = xid.getBranchQualifier();
 
-        os.write(XaWrapperImpl.getPrefix());
+        os.write(XaWrapper.getPrefix());
         ByteArray.writeIntRaw(os, xid.getFormatId());
         write(os, globalTransactionId);
         write(os, branchQualifier);
@@ -52,7 +51,7 @@ class Serializer implements CommandSerializer {
         final ByteBuffer wrapped = this.serialize(command.getCommand()).rewind();
         final ByteBuffer buf = ByteBuffer.allocate(2 + 4 + 4 + globalTransactionId.length + 4 + branchQualifier.length + wrapped.remaining());
 
-        buf.put(XaWrapperImpl.getPrefix());
+        buf.put(XaWrapper.getPrefix());
         buf.putInt(xid.getFormatId());
         buf.putInt(globalTransactionId.length);
         buf.put(globalTransactionId);

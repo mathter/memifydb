@@ -2,7 +2,6 @@ package io.github.mathter.memifydb.common.command.v1;
 
 import io.github.mathter.memifydb.common.command.Command;
 import io.github.mathter.memifydb.common.command.CommandDeserializer;
-import io.github.mathter.memifydb.common.command.xa.XaWrapper;
 import io.github.mathter.memifydb.common.util.ByteArray;
 import io.github.mathter.memifydb.common.xa.Xid;
 
@@ -35,13 +34,13 @@ class Deserializer implements CommandDeserializer {
 
     static {
         map = Map.of(
-                new Key(XaWrapperImpl.getPrefix()), Deserializer::readXaWrapper,
+                new Key(XaWrapper.getPrefix()), Deserializer::readXaWrapper,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
         );
 
         channelMap = Map.of(
-                new Key(XaWrapperImpl.getPrefix()), Deserializer::readXaWrapper,
+                new Key(XaWrapper.getPrefix()), Deserializer::readXaWrapper,
                 new Key(PutCommand.getPrefix()), Deserializer::readPutCommand,
                 new Key(RemoveCommand.getPrefix()), Deserializer::readRemoveCommand
         );
@@ -87,7 +86,7 @@ class Deserializer implements CommandDeserializer {
     }
 
     private XaWrapper<?> readXaWrapper(InputStream is) throws IOException {
-        return new XaWrapperImpl<>(
+        return new XaWrapper<>(
                 Xid.of(ByteArray.readIntRaw(is), read(is), read(is)),
                 this.deserialize(is)
         );
@@ -97,7 +96,7 @@ class Deserializer implements CommandDeserializer {
         final ByteBuffer xidFormatIdBuffer = ByteBuffer.allocate(4);
         if (channel.read(xidFormatIdBuffer) == 4) {
             xidFormatIdBuffer.rewind();
-            return new XaWrapperImpl<>(
+            return new XaWrapper<>(
                     Xid.of(xidFormatIdBuffer.getInt(), read(channel), read(channel)),
                     this.deserialize(channel)
             );
