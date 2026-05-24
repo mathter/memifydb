@@ -1,5 +1,6 @@
 module io.github.mathter.memifydb.log.api {
     requires transitive io.github.mathter.memifydb.common;
+    requires io.github.mathter.memifydb.command;
 
     exports io.github.mathter.memifydb.log;
 

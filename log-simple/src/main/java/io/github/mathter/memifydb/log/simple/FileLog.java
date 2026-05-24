@@ -1,9 +1,9 @@
 package io.github.mathter.memifydb.log.simple;
 
-import io.github.mathter.memifydb.common.command.Command;
-import io.github.mathter.memifydb.common.command.CommandDeserializer;
-import io.github.mathter.memifydb.common.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.common.command.CommandSerializer;
+import io.github.mathter.memifydb.command.Command;
+import io.github.mathter.memifydb.command.CommandDeserializer;
+import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializer;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.Package;
 import org.apache.commons.lang3.tuple.Pair;

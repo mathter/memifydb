@@ -1,8 +1,9 @@
 package io.github.mathter.memifydb.log.simple;
 
-import io.github.mathter.memifydb.common.command.Command;
-import io.github.mathter.memifydb.common.command.v1.PutCommand;
-import io.github.mathter.memifydb.common.command.v1.CommandSerializationFactoryV1;
+import io.github.mathter.memifydb.command.Command;
+import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.command.v1.PutCommand;
+import io.github.mathter.memifydb.command.v1.CommandSerializationFactoryV1;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 import io.github.mathter.memifydb.log.Package;
@@ -56,13 +57,13 @@ public class FileLogFactoryTest {
                 new Package(
                         UUID.randomUUID(),
                         keyValue0.stream()
-                                .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
+                                .map(e -> new PutCommand(new SequenceNumber(0), spaceName, e.getLeft(), e.getLeft()))
                                 .toArray(Command[]::new)
                 ),
                 new Package(
                         UUID.randomUUID(),
                         keyValue1.stream()
-                                .map(e -> new PutCommand(spaceName, e.getLeft(), e.getLeft()))
+                                .map(e -> new PutCommand(new SequenceNumber(0), spaceName, e.getLeft(), e.getLeft()))
                                 .toArray(Command[]::new)
                 )
         };

@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.log.simple;
 
-import io.github.mathter.memifydb.common.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationFactory;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 

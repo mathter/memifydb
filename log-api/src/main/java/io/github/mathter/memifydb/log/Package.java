@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.log;
 
-import io.github.mathter.memifydb.common.command.Command;
+import io.github.mathter.memifydb.command.Command;
 
 import java.util.Objects;
 import java.util.UUID;
