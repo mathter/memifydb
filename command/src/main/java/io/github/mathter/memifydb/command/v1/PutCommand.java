@@ -2,6 +2,7 @@ package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.common.data.Value;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -27,58 +28,47 @@ import java.util.Objects;
 public class PutCommand extends AbstractCommand {
     private static final byte[] PREFIX = {0x01, 0x0A};
 
-    private final byte[] rawSpaceName;
+    private final String spaceName;
 
-    private final byte[] rawKey;
+    private final Value key;
 
-    private final byte[] rawValue;
+    private final Value value;
 
-    public PutCommand(SequenceNumber sequenceNumber, String spaceName, byte[] rawKey, byte[] rawValue) {
+    public PutCommand(SequenceNumber sequenceNumber, String spaceName, Value key, Value value) {
         super(sequenceNumber);
-        this.rawSpaceName = spaceName.getBytes(StandardCharsets.UTF_8);
-        this.rawKey = rawKey;
-        this.rawValue = rawValue;
-    }
-
-    public PutCommand(SequenceNumber sequenceNumber, byte[] rawSpaceName, byte[] rawKey, byte[] rawValue) {
-        super(sequenceNumber);
-        this.rawSpaceName = rawSpaceName;
-        this.rawKey = rawKey;
-        this.rawValue = rawValue;
+        this.spaceName = spaceName;
+        this.key = key;
+        this.value = value;
     }
 
     public static byte[] getPrefix() {
         return PREFIX;
     }
 
-    public byte[] getRawSpaceName() {
-        return this.rawSpaceName;
-    }
-
     public String getSpaceName() {
-        return new String(this.rawSpaceName, StandardCharsets.UTF_8);
+        return this.spaceName;
     }
 
-    public byte[] getRawKey() {
-        return this.rawKey;
+    public Value getKey() {
+        return this.key;
     }
 
-    public byte[] getRawValue() {
-        return this.rawValue;
+    public Value getValue() {
+        return this.value;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(PREFIX, this.rawSpaceName, this.rawKey, this.rawValue);
+        return Objects.hash(PREFIX, this.spaceName, this.key, this.value);
     }
 
     @Override
     public boolean equals(Object obj) {
         return this == obj
                 || (obj instanceof PutCommand another
-                && Arrays.equals(this.rawSpaceName, another.rawSpaceName)
-                && Arrays.equals(this.rawKey, another.rawKey)
-                && Arrays.equals(this.rawValue, another.rawValue)
+                && Objects.equals(this.spaceName, another.spaceName)
+                && Objects.equals(this.key, another.key)
+                && Objects.equals(this.value, another.value)
         );
     }
 }

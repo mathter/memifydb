@@ -57,12 +57,12 @@ class SimpleSpace implements Space<KeyValueOperations> {
     }
 
     @Override
-    public UUID id() {
+    public UUID getId() {
         return this.id;
     }
 
     @Override
-    public String name() {
+    public String getName() {
         return this.name;
     }
 

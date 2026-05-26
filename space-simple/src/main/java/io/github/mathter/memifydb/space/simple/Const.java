@@ -1,5 +1,7 @@
 package io.github.mathter.memifydb.space.simple;
 
+import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -16,6 +18,8 @@ package io.github.mathter.memifydb.space.simple;
  * limitations under the License.
  */
 public interface Const {
+    public static final String ID = SimpleSpaceFactory.class.getName();
+
     public static final String PROPERTY_ID = "id";
 
     public static final String PROPERTY_TRANSACTION_TIMEOUT = "transaction-timeout";

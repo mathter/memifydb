@@ -14,6 +14,10 @@
     <dependencies>
         <dependency>
             <groupId>io.github.mathter.memifydb</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mathter.memifydb</groupId>
             <artifactId>command</artifactId>
         </dependency>
         <dependency>

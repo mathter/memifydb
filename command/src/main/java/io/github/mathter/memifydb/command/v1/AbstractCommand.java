@@ -21,7 +21,7 @@ import io.github.mathter.memifydb.command.SequenceNumber;
 abstract class AbstractCommand implements Command {
     private final SequenceNumber sequenceNumber;
 
-    public AbstractCommand(SequenceNumber sequenceNumber) {
+    protected AbstractCommand(SequenceNumber sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
     }
 

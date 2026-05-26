@@ -16,10 +16,10 @@ public class RawValueTest {
 
         Assertions.assertEquals(raw, rawValue.getRaw());
 
-        final String cached = rawValue.get();
+        final String cached = rawValue.get(String.class);
         Assertions.assertEquals(value, cached);
 
-        final String cached2 = rawValue.get();
+        final String cached2 = rawValue.get(String.class);
         Assertions.assertEquals(value, cached2);
     }
 }

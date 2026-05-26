@@ -24,11 +24,9 @@ import java.util.UUID;
  * limitations under the License.
  */
 public class SimpleSpaceFactory extends SpaceFactory {
-    public static final String ID = SimpleSpaceFactory.class.getName();
-
     @Override
     public String id() {
-        return ID;
+        return Const.ID;
     }
 
     @Override

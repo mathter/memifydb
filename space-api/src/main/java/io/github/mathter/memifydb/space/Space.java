@@ -27,14 +27,14 @@ public interface Space<T extends Operations> extends OperationsProvider<T>, Auto
      *
      * @return unique identifier.
      */
-    public UUID id();
+    public UUID getId();
 
     /**
      * Name of the space. It is like as table name on a RDBMS.
      *
      * @return name of the store.
      */
-    public String name();
+    public String getName();
 
     /**
      *

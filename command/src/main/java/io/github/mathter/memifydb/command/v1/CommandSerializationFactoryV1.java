@@ -1,8 +1,9 @@
 package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.CommandDeserializer;
 import io.github.mathter.memifydb.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.command.CommandSerializer;
+import io.github.mathter.memifydb.common.data.ValueDeserializer;
+import io.github.mathter.memifydb.common.data.ValueFactory;
+import io.github.mathter.memifydb.common.data.ValueSerializer;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -19,8 +20,20 @@ import io.github.mathter.memifydb.command.CommandSerializer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class CommandSerializationFactoryV1 extends CommandSerializationFactory {
+class CommandSerializationFactoryV1 extends CommandSerializationFactory {
     public static final String ID = "simple";
+
+    private final ValueFactory valueFactory;
+
+    private final ValueSerializer valueSerializer;
+
+    private final ValueDeserializer valueDeserializer;
+
+    public CommandSerializationFactoryV1(ValueFactory valueFactory) {
+        this.valueFactory = valueFactory;
+        this.valueSerializer = valueFactory.serializer();
+        this.valueDeserializer = valueFactory.deserializer();
+    }
 
     @Override
     public String id() {
@@ -28,12 +41,17 @@ public class CommandSerializationFactoryV1 extends CommandSerializationFactory {
     }
 
     @Override
-    public CommandSerializer serializer() {
-        return new Serializer();
+    public io.github.mathter.memifydb.command.CommandSerializer serializer() {
+        return new CommandSerializerV1(this.valueSerializer, this.valueDeserializer);
     }
 
     @Override
-    public CommandDeserializer deserializer() {
-        return new Deserializer();
+    public io.github.mathter.memifydb.command.CommandDeserializer deserializer() {
+        return new CommandDeserializerV1(this.valueSerializer, this.valueDeserializer);
+    }
+
+    @Override
+    public ValueFactory valueFactory() {
+        return this.valueFactory;
     }
 }

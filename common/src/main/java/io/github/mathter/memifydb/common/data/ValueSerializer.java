@@ -24,5 +24,5 @@ public interface ValueSerializer {
      * @param value value instance.
      * @return byte representaion.
      */
-    public byte[] serialize(Value value);
+    public byte[] serialize(Object value);
 }

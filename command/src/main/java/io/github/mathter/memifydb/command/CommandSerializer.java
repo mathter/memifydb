@@ -22,6 +22,4 @@ import java.nio.channels.WritableByteChannel;
  */
 public interface CommandSerializer {
     public boolean serialize(OutputStream os, Command command) throws IOException;
-
-    public ByteBuffer serialize(Command command) throws IOException;
 }

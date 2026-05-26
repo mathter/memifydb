@@ -31,13 +31,7 @@ import java.nio.channels.WritableByteChannel;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class XaEndTransactionCommandTest {
-    final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
-
-    final CommandSerializer serializer = this.factory.serializer();
-
-    final CommandDeserializer deserializer = this.factory.deserializer();
-
+public class XaEndTransactionCommandTest extends AbstractCommadTest {
     @Test
     public void testStreamChannel() throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -47,25 +41,9 @@ public class XaEndTransactionCommandTest {
 
         this.serializer.serialize(baos, command);
 
-        final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        final ReadableByteChannel channel = Channels.newChannel(bais);
+        final ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        final XaEndTransactionCommand deserializedCommand = this.deserializer.deserialize(channel);
-        Assertions.assertNotNull(deserializedCommand);
-        Assertions.assertEquals(xid, deserializedCommand.getXid());
-    }
-
-    @Test
-    public void testChannelStream() throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final WritableByteChannel channel = Channels.newChannel(baos);
-        final SequenceNumber sequenceNumber = new SequenceNumber(RandomUtils.nextInt());
-        final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
-        final XaEndTransactionCommand command = new XaEndTransactionCommand(sequenceNumber, xid, RandomUtils.nextInt());
-
-        channel.write(this.serializer.serialize(command).rewind());
-
-        final XaEndTransactionCommand deserializedCommand = this.deserializer.deserialize(new ByteArrayInputStream(baos.toByteArray()));
+        final XaEndTransactionCommand deserializedCommand = this.deserializer.deserialize(is);
         Assertions.assertNotNull(deserializedCommand);
         Assertions.assertEquals(xid, deserializedCommand.getXid());
     }

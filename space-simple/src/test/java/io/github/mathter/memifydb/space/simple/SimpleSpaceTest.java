@@ -6,7 +6,6 @@ import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
 import io.github.mathter.memifydb.common.util.Opt;
 import io.github.mathter.memifydb.space.KeyValueOperations;
 import io.github.mathter.memifydb.space.SpaceFactory;
-import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,7 @@ public class SimpleSpaceTest {
 
     @BeforeEach
     public void init() {
-        this.operations = (KeyValueOperations) SpaceFactory.getInstance(SimpleSpaceFactory.ID)
+        this.operations = (KeyValueOperations) SpaceFactory.getInstance(Const.ID)
                 .get(RandomStringUtils.random(10))
                 .operatons();
     }

@@ -18,6 +18,13 @@ package io.github.mathter.memifydb.common.data;
  * This class is universal representation of any data in raw format.
  */
 public interface Value {
+    public byte[] getRaw();
+
+    @SuppressWarnings("unchecked")
+    public default <T> T get() {
+        return (T) this.get(Object.class);
+    }
+
     /**
      * The method returns the underlying data in a specific Java format.
      * The return value is determined by the format of the underlying data and there is no automatic conversion to type {@code T}.
@@ -25,5 +32,5 @@ public interface Value {
      * @param <T> type of java.
      * @return object.
      */
-    public <T> T get();
+    public <T> T get(Class<T> clazz);
 }

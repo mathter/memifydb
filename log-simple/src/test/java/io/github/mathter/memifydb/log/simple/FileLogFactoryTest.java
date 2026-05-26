@@ -2,8 +2,10 @@ package io.github.mathter.memifydb.log.simple;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.command.v1.CommandSerializationFactoryProviderV1;
 import io.github.mathter.memifydb.command.v1.PutCommand;
-import io.github.mathter.memifydb.command.v1.CommandSerializationFactoryV1;
+import io.github.mathter.memifydb.common.data.ValueFactory;
+import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 import io.github.mathter.memifydb.log.Package;
@@ -38,6 +40,8 @@ import java.util.stream.IntStream;
  * limitations under the License.
  */
 public class FileLogFactoryTest {
+    private final ValueFactory valueFactory = ValueFactory.get(FasterXmlValueFactory.ID);
+
     @Test
     public void test() throws IOException {
         final String spaceName = RandomStringUtils.random(10);
@@ -57,13 +61,25 @@ public class FileLogFactoryTest {
                 new Package(
                         UUID.randomUUID(),
                         keyValue0.stream()
-                                .map(e -> new PutCommand(new SequenceNumber(0), spaceName, e.getLeft(), e.getLeft()))
+                                .map(e -> new PutCommand(
+                                                new SequenceNumber(0),
+                                                spaceName,
+                                                this.valueFactory.translator().from(e.getLeft()),
+                                                this.valueFactory.translator().from(e.getLeft())
+                                        )
+                                )
                                 .toArray(Command[]::new)
                 ),
                 new Package(
                         UUID.randomUUID(),
                         keyValue1.stream()
-                                .map(e -> new PutCommand(new SequenceNumber(0), spaceName, e.getLeft(), e.getLeft()))
+                                .map(e -> new PutCommand(
+                                                new SequenceNumber(0),
+                                                spaceName,
+                                                this.valueFactory.translator().from(e.getLeft()),
+                                                this.valueFactory.translator().from(e.getLeft())
+                                        )
+                                )
                                 .toArray(Command[]::new)
                 )
         };
@@ -72,7 +88,7 @@ public class FileLogFactoryTest {
                         FileLogFactory.Const.PARAM_LOG_ROOT_DIR, root,
                         FileLogFactory.Const.PARAM_FILE_MAX_SIZE, 100,
                         FileLogFactory.Const.PARAM_COMMAND_SERELIZATION_FACTORY,
-                        CommandSerializationFactoryV1.ID
+                        CommandSerializationFactoryProviderV1.ID
                 )
         );
 

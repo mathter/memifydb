@@ -16,6 +16,12 @@
             <groupId>io.github.mathter.memifydb</groupId>
             <artifactId>common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.mathter.memifydb</groupId>
+            <artifactId>data-cbor-fasterxml</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -31,6 +37,10 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.mathter.memifydb</groupId>
+            <artifactId>data-cbor-fasterxml</artifactId>
         </dependency>
     </dependencies>
 

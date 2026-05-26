@@ -8,7 +8,6 @@ import io.github.mathter.memifydb.common.util.Opt;
 import io.github.mathter.memifydb.space.KeyValueOperations;
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.space.SpaceFactory;
-import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
 import io.github.mathter.memifydb.transaction.xa.XaResourceProvider;
 import io.github.mathter.memifydb.transaction.xa.Xid;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,7 +42,7 @@ public class XaSimpleSpaceTest {
 
     @BeforeEach
     public void init() {
-        this.space = SpaceFactory.getInstance(SimpleSpaceFactory.ID)
+        this.space = SpaceFactory.getInstance(Const.ID)
                 .get(RandomStringUtils.random(10));
     }
 

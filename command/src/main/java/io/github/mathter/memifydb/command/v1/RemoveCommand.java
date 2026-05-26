@@ -2,6 +2,7 @@ package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.common.data.Value;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -27,49 +28,39 @@ import java.util.Objects;
 public class RemoveCommand extends AbstractCommand {
     private static final byte[] PREFIX = {0x01, 0x0B};
 
-    private final byte[] rawSpaceName;
+    private final String spaceName;
 
-    private final byte[] rawKey;
+    private final Value key;
 
-    public RemoveCommand(SequenceNumber sequenceNumber, String spaceName, byte[] rawKey) {
+    public RemoveCommand(SequenceNumber sequenceNumber, String spaceName, Value key) {
         super(sequenceNumber);
-        this.rawSpaceName = spaceName.getBytes(StandardCharsets.UTF_8);
-        this.rawKey = rawKey;
-    }
-
-    public RemoveCommand(SequenceNumber sequenceNumber, byte[] rawSpaceName, byte[] rawKey) {
-        super(sequenceNumber);
-        this.rawSpaceName = rawSpaceName;
-        this.rawKey = rawKey;
+        this.spaceName = spaceName;
+        this.key = key;
     }
 
     public static byte[] getPrefix() {
         return PREFIX;
     }
 
-    public byte[] getRawSpaceName() {
-        return rawSpaceName;
-    }
-
     public String getSpaceName() {
-        return new String(this.rawSpaceName, StandardCharsets.UTF_8);
+        return this.spaceName;
     }
 
-    public byte[] getRawKey() {
-        return rawKey;
+    public Value getKey() {
+        return this.key;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(PREFIX, this.rawSpaceName, this.rawKey);
+        return Objects.hash(PREFIX, this.spaceName, this.key);
     }
 
     @Override
     public boolean equals(Object obj) {
         return this == obj
                 || (obj instanceof RemoveCommand another
-                && Arrays.equals(this.rawSpaceName, another.rawSpaceName)
-                && Arrays.equals(this.rawKey, another.rawKey)
+                && Objects.equals(this.spaceName, another.spaceName)
+                && Objects.equals(this.key, another.key)
         );
     }
 }

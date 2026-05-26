@@ -1,4 +1,9 @@
 package io.github.mathter.memifydb.command;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -15,4 +20,7 @@ package io.github.mathter.memifydb.command;
  * limitations under the License.
  */
 public interface ResultSerializer {
+    public boolean serialize(OutputStream os, Result result) throws IOException;
+
+    public ByteBuffer serialize(Result result) throws IOException;
 }

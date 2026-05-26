@@ -1,4 +1,5 @@
 module io.github.mathter.memifydb.core.data.fasterxml {
+    requires java.base;
     requires tools.jackson.dataformat.cbor;
     requires tools.jackson.core;
 

@@ -15,5 +15,9 @@ package io.github.mathter.memifydb.command;
  * limitations under the License.
  */
 public interface Result {
+    public static byte[] getPrefix() {
+        throw new UnsupportedOperationException();
+    }
+
     public SequenceNumber getSequenceNumber();
 }

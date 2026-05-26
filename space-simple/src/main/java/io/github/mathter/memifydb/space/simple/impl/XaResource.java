@@ -299,8 +299,8 @@ class XaResource implements XAResource, XaResourceProvider<KeyValueOperations>, 
     public String toString() {
         final StringBuilder sb = new StringBuilder("XaResource{");
         sb.append(SimpleSpace.class.getName()).append(", ");
-        sb.append("name=").append(this.space.name());
-        sb.append("id=").append(this.space.id());
+        sb.append("name=").append(this.space.getName());
+        sb.append("id=").append(this.space.getId());
         sb.append("}");
 
         return sb.toString();

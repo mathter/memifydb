@@ -4,14 +4,19 @@ import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.CommandDeserializer;
 import io.github.mathter.memifydb.command.CommandSerializationFactory;
 import io.github.mathter.memifydb.command.CommandSerializer;
+import io.github.mathter.memifydb.common.util.ByteArray;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.Package;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -113,22 +118,19 @@ class FileLog implements Log {
     @Override
     public void log(Package pack) throws IOException {
         final Command[] commands = pack.getCommands();
-        final ByteBuffer[] buffers = new ByteBuffer[1 + commands.length];
-        buffers[0] = ByteBuffer.allocate(PACKAGE_SIGNATURE.length + 2 * Long.BYTES + Integer.BYTES);
-
-        buffers[0].put(PACKAGE_SIGNATURE);
-
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final UUID transactionId = pack.getTransactionId();
-        buffers[0].putLong(transactionId.getMostSignificantBits());
-        buffers[0].putLong(transactionId.getLeastSignificantBits());
-        buffers[0].putInt(commands.length);
-        buffers[0].rewind();
+
+        baos.write(PACKAGE_SIGNATURE);
+        ByteArray.writeLongRaw(baos, transactionId.getMostSignificantBits());
+        ByteArray.writeLongRaw(baos, transactionId.getLeastSignificantBits());
+        ByteArray.writeIntRaw(baos, commands.length);
 
         for (int i = 0, count = commands.length; i < count; i++) {
-            buffers[i + 1] = this.serializer.serialize(commands[i]);
+            this.serializer.serialize(baos, commands[i]);
         }
 
-        this.channel.write(buffers);
+        this.channel.write(ByteBuffer.wrap(baos.toByteArray()));
     }
 
     @Override
@@ -156,8 +158,9 @@ class FileLog implements Log {
                         .flatMap(path -> {
                             try {
                                 final FileChannel ch = FileChannel.open(path, StandardOpenOption.READ);
+                                final InputStream is = Channels.newInputStream(ch);
                                 final Header header = Header.read(ch);
-                                return StreamSupport.stream(new PackageSpliterator(ch), false);
+                                return StreamSupport.stream(new PackageSpliterator(is), false);
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -178,16 +181,16 @@ class FileLog implements Log {
 
         private static final Cleaner CLEANER = Cleaner.create();
 
-        private final ReadableByteChannel channel;
+        private final InputStream is;
 
         private final Cleaner.Cleanable cleanable;
 
-        public PackageSpliterator(ReadableByteChannel channel) {
-            this.channel = channel;
+        public PackageSpliterator(InputStream is) {
+            this.is = is;
             this.cleanable = CLEANER.register(this, () -> {
                 try {
-                    LOG.info("Close channel" + this.channel);
-                    this.channel.close();
+                    LOG.info("Close input stream" + this.is);
+                    this.is.close();
                 } catch (IOException e) {
                     LOG.log(Level.SEVERE, "Error were occurred while channel closing!");
                 }
@@ -198,43 +201,34 @@ class FileLog implements Log {
         public boolean tryAdvance(Consumer<? super Package> action) {
             final boolean result;
             try {
-                final ByteBuffer packHeader = ByteBuffer.allocate(PACKAGE_SIGNATURE.length + 2 * Long.BYTES + Integer.BYTES);
-                do {
-                    if (this.channel.read(packHeader) < 0) {
-                        if (packHeader.position() == 0) {
-                            this.channel.close();
-                            return false;
+                final byte[] signature = this.is.readNBytes(PACKAGE_SIGNATURE.length);
+
+                if (signature.length == 2) {
+                    if (Arrays.equals(PACKAGE_SIGNATURE, signature)) {
+                        final UUID transactionId = new UUID(ByteArray.readLongRaw(this.is), ByteArray.readLongRaw(is));
+                        final int commandCount = ByteArray.readIntRaw(this.is);
+                        final Command[] commands = new Command[commandCount];
+
+                        if (commandCount >= 0) {
+                            for (int i = 0; i < commandCount; i++) {
+                                commands[i] = FileLog.this.deserializer.deserialize(this.is);
+                            }
+
+                            final Package pack = new Package(transactionId, commands);
+                            action.accept(pack);
                         } else {
-                            throw new EOFException();
-                        }
-                    }
-                } while (packHeader.position() < packHeader.capacity());
-
-                final byte[] signature = new byte[PACKAGE_SIGNATURE.length];
-
-                packHeader.rewind();
-                packHeader.get(signature);
-
-                if (Arrays.equals(PACKAGE_SIGNATURE, signature)) {
-                    final UUID transactionId = new UUID(packHeader.getLong(), packHeader.getLong());
-                    final int commandCount = packHeader.getInt();
-                    final Command[] commands = new Command[commandCount];
-
-                    if (commandCount >= 0) {
-                        for (int i = 0; i < commandCount; i++) {
-                            commands[i] = FileLog.this.deserializer.deserialize(this.channel);
+                            throw new IllegalStateException("Command count less then 0!");
                         }
 
-                        final Package pack = new Package(transactionId, commands);
-                        action.accept(pack);
+                        result = true;
                     } else {
-                        throw new IllegalStateException("Command count less then 0!");
+                        throw new IllegalStateException(String.format("Invalid package signature %s!", Arrays.toString(signature)));
                     }
                 } else {
-                    throw new IllegalStateException(String.format("Invalid package signature!"));
+                    result = false;
                 }
 
-                return true;
+                return result;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

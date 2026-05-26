@@ -1,7 +1,11 @@
 package io.github.mathter.memifydb.command;
 
+import io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
+import io.github.mathter.memifydb.common.data.ValueFactory;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
@@ -20,23 +24,16 @@ import java.util.ServiceLoader;
  * limitations under the License.
  */
 public abstract class CommandSerializationFactory {
-    public static final List<String> factories() {
-        final List<String> result = new ArrayList<>();
-        final ServiceLoader<CommandSerializationFactory> serviceLoader = ServiceLoader.load(CommandSerializationFactory.class);
-
-        for (CommandSerializationFactory factory : serviceLoader) {
-            result.add(factory.id());
-        }
-
-        return result;
+    public static final CommandSerializationFactory get(String id) {
+        return get(id, null);
     }
 
-    public static final CommandSerializationFactory get(String id) {
-        final ServiceLoader<CommandSerializationFactory> serviceLoader = ServiceLoader.load(CommandSerializationFactory.class);
+    public static final CommandSerializationFactory get(String id, Map<?, ?> properties) {
+        final ServiceLoader<CommandSerializationFactoryProvider> serviceLoader = ServiceLoader.load(CommandSerializationFactoryProvider.class);
 
-        for (CommandSerializationFactory factory : serviceLoader) {
-            if (id.equals(factory.id())) {
-                return factory;
+        for (CommandSerializationFactoryProvider provider : serviceLoader) {
+            if (id.equals(provider.id())) {
+                return provider.get(properties);
             }
         }
 
@@ -50,4 +47,6 @@ public abstract class CommandSerializationFactory {
     public abstract CommandSerializer serializer();
 
     public abstract CommandDeserializer deserializer();
+
+    public abstract ValueFactory valueFactory();
 }

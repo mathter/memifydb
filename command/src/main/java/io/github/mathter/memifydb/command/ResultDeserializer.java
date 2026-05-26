@@ -1,4 +1,9 @@
 package io.github.mathter.memifydb.command;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.ReadableByteChannel;
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -15,4 +20,5 @@ package io.github.mathter.memifydb.command;
  * limitations under the License.
  */
 public interface ResultDeserializer {
+    public <R extends Result> R deserialize(InputStream is) throws IOException;
 }

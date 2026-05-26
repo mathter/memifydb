@@ -2,7 +2,6 @@ package io.github.mathter.memifydb.command;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.ReadableByteChannel;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -21,6 +20,4 @@ import java.nio.channels.ReadableByteChannel;
  */
 public interface CommandDeserializer {
     public <C extends Command> C deserialize(InputStream is) throws IOException;
-
-    public <C extends Command> C deserialize(ReadableByteChannel channel) throws IOException;
 }

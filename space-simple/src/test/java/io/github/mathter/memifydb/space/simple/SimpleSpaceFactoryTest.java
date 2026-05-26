@@ -2,7 +2,6 @@ package io.github.mathter.memifydb.space.simple;
 
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.space.SpaceFactory;
-import io.github.mathter.memifydb.space.simple.impl.SimpleSpaceFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,12 +29,12 @@ public class SimpleSpaceFactoryTest {
     public void testCreate() {
         final String name = RandomStringUtils.random(10);
 
-        final SpaceFactory spaceFactory = SpaceFactory.getInstance(SimpleSpaceFactory.ID);
+        final SpaceFactory spaceFactory = SpaceFactory.getInstance(Const.ID);
         Assertions.assertNotNull(spaceFactory);
 
         final Space space = spaceFactory.get(name, null);
         Assertions.assertNotNull(space);
-        Assertions.assertEquals(name, space.name());
+        Assertions.assertEquals(name, space.getName());
     }
 
     @Test
@@ -43,13 +42,13 @@ public class SimpleSpaceFactoryTest {
         final UUID id = UUID.randomUUID();
         final String name = RandomStringUtils.random(10);
 
-        final SpaceFactory spaceFactory = SpaceFactory.getInstance(SimpleSpaceFactory.ID);
+        final SpaceFactory spaceFactory = SpaceFactory.getInstance(Const.ID);
         Assertions.assertNotNull(spaceFactory);
 
         final Space space = spaceFactory.get(name, Map.of(Const.PROPERTY_ID, id));
         Assertions.assertNotNull(space);
-        Assertions.assertEquals(id, space.id());
-        Assertions.assertEquals(name, space.name());
+        Assertions.assertEquals(id, space.getId());
+        Assertions.assertEquals(name, space.getName());
     }
 
     @Test
@@ -57,12 +56,12 @@ public class SimpleSpaceFactoryTest {
         final UUID id = UUID.randomUUID();
         final String name = RandomStringUtils.random(10);
 
-        final SpaceFactory spaceFactory = SpaceFactory.getInstance(SimpleSpaceFactory.ID);
+        final SpaceFactory spaceFactory = SpaceFactory.getInstance(Const.ID);
         Assertions.assertNotNull(spaceFactory);
 
         final Space space = spaceFactory.get(name, Map.of(Const.PROPERTY_ID, id.toString()));
         Assertions.assertNotNull(space);
-        Assertions.assertEquals(id, space.id());
-        Assertions.assertEquals(name, space.name());
+        Assertions.assertEquals(id, space.getId());
+        Assertions.assertEquals(name, space.getName());
     }
 }

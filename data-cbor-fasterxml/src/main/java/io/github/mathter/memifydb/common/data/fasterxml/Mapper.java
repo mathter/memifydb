@@ -8,8 +8,6 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.cbor.CBORMapper;
 
-import java.io.IOException;
-
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -30,24 +28,34 @@ class Mapper implements ValueSerializer, ValueDeserializer, ValueTranslator {
 
     @Override
     public <T> Value from(T object) {
+        final Value result;
+
         try {
-            return this.deserialize(this.mapper.writeValueAsBytes(object));
+            if (object == null) {
+                result = new JavaValue(this.mapper, Object.class);
+            } else {
+                result = new JavaValue(this.mapper, object);
+            }
         } catch (JacksonException e) {
             throw new IllegalStateException(object + " can't be represented as Value!", e);
         }
+
+        return result;
     }
 
     @Override
     public <T> T to(Value value, Class<T> clazz) {
+        final T result;
+
         if (value instanceof RawValue rawValue) {
-            try {
-                return this.mapper.readValue(rawValue.getRaw(), clazz);
-            } catch (JacksonException e) {
-                throw new IllegalStateException("Can't parse!", e);
-            }
+            result = rawValue.get(clazz);
+        } else if (value instanceof JavaValue javaValue) {
+            result = javaValue.get(clazz);
         } else {
             throw new IllegalStateException(value + " is not instance of valid type!");
         }
+
+        return result;
     }
 
     @Override
@@ -56,11 +64,17 @@ class Mapper implements ValueSerializer, ValueDeserializer, ValueTranslator {
     }
 
     @Override
-    public byte[] serialize(Value value) {
-        if (value instanceof RawValue rawValue) {
-            return rawValue.getRaw();
+    public byte[] serialize(Object value) {
+        final byte[] result;
+
+        if (value instanceof Raw raw) {
+            result = raw.getRaw();
+        } else if (value instanceof Value val) {
+            result = this.mapper.writeValueAsBytes(val.get());
         } else {
-            throw new IllegalStateException(value + " is not instance of valid type!");
+            result = this.mapper.writeValueAsBytes(value);
         }
+
+        return result;
     }
 }

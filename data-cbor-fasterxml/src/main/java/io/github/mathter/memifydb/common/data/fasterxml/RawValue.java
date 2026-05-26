@@ -26,12 +26,12 @@ import java.util.Objects;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class RawValue implements Value {
+class RawValue implements Value, Raw {
     private final ObjectMapper mapper;
 
     private final byte[] raw;
 
-    private Reference<Opt<?>> reference;
+    private Reference<Opt<Object>> reference;
 
     public RawValue(ObjectMapper mapper, byte[] raw) {
         this.mapper = mapper;
@@ -39,32 +39,33 @@ class RawValue implements Value {
         this.reference = null;
     }
 
+    @Override
     public byte[] getRaw() {
         return raw;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T get() {
+    public <T> T get(Class<T> clazz) {
         final T result;
-        Opt<T> tmp;
+        Opt<Object> tmp = null;
 
-        if (this.reference == null || (tmp = (Opt<T>) this.reference.get()) == null) {
-            result = this.calc();
+        if (this.reference == null || (tmp = this.reference.get()) == null) {
+            result = this.calc(clazz);
             this.reference = new SoftReference<>(Opt.of(result));
         } else {
-            result = tmp.get();
+            result = (T) tmp.get();
         }
 
         return result;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T calc() {
+    private <T> T calc(Class<T> clazz) {
         final T result;
 
         try {
-            result = (T) this.mapper.readValue(this.raw, Object.class);
+            result = (T) this.mapper.readValue(this.raw, clazz);
         } catch (JacksonException e) {
             throw new IllegalStateException("Can't parse data!", e);
         }
@@ -86,7 +87,7 @@ class RawValue implements Value {
         } else if (obj instanceof RawValue another) {
             return Arrays.equals(this.raw, another.raw);
         } else if (obj instanceof Value value) {
-            result = Objects.equals(this.get(), value.get());
+            result = Arrays.equals(this.raw, value.getRaw());
         } else {
             result = false;
         }
