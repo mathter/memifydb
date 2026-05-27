@@ -34,7 +34,7 @@ class ResultSerializationFactoryV1 extends ResultSerializationFactory {
 
     @Override
     public ResultDeserializer deserializer() {
-        return new ResultDeserializerV1();
+        return new ResultDeserializerV1(valueFactory.deserializer());
     }
 
     @Override

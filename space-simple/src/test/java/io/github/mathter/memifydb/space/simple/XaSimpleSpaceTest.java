@@ -50,8 +50,8 @@ public class XaSimpleSpaceTest {
     public void testUseOperationsNoValidResource() throws Exception {
         final Xid xid = Xid.of(0, RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8), RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8));
         final XaResourceProvider<KeyValueOperations> xaResource = this.space.xaResource();
-        final KeyValueOperations operations = xaResource.xa(xid);
 
+        final KeyValueOperations operations = xaResource.xa(xid);
         Assertions.assertThrows(IllegalStateException.class, () -> operations.put(this.translator.from(10), this.translator.from(5)));
 
         xaResource.start(xid, XAResource.TMNOFLAGS);
@@ -65,9 +65,9 @@ public class XaSimpleSpaceTest {
         final Value value = this.translator.from(RandomStringUtils.random(10));
         final Xid xid = Xid.of(0, RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8), RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8));
         final XaResourceProvider<KeyValueOperations> xaResource = this.space.xaResource();
-        final KeyValueOperations operations = xaResource.xa(xid);
 
         xaResource.start(xid, XAResource.TMNOFLAGS);
+        final KeyValueOperations operations = xaResource.xa(xid);
         operations.put(key, value);
 
         Assertions.assertTrue(this.space.operatons().get(key).isEmpty());
@@ -86,9 +86,9 @@ public class XaSimpleSpaceTest {
         final Value value = this.translator.from(RandomStringUtils.random(10));
         final Xid xid = Xid.of(0, RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8), RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8));
         final XaResourceProvider<KeyValueOperations> xaResource = this.space.xaResource();
-        final KeyValueOperations operations = xaResource.xa(xid);
 
         xaResource.start(xid, XAResource.TMNOFLAGS);
+        final KeyValueOperations operations = xaResource.xa(xid);
         operations.put(key, value);
 
         Assertions.assertTrue(this.space.operatons().get(key).isEmpty());
@@ -106,9 +106,9 @@ public class XaSimpleSpaceTest {
         final Value value = this.translator.from(RandomStringUtils.random(10));
         final Xid xid = Xid.of(0, RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8), RandomStringUtils.random(5).getBytes(StandardCharsets.UTF_8));
         final XaResourceProvider<KeyValueOperations> xaResource = this.space.xaResource();
-        final KeyValueOperations operations = xaResource.xa(xid);
 
         xaResource.start(xid, XAResource.TMNOFLAGS);
+        final KeyValueOperations operations = xaResource.xa(xid);
         operations.put(key, value);
 
         Assertions.assertTrue(this.space.operatons().get(key).isEmpty());

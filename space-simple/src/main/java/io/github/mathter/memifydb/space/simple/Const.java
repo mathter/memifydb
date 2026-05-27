@@ -24,5 +24,5 @@ public interface Const {
 
     public static final String PROPERTY_TRANSACTION_TIMEOUT = "transaction-timeout";
 
-    public static final long DEFAULT_TRANSACTION_TIMEOUT = 10;
+    public static final long DEFAULT_TRANSACTION_TIMEOUT = 60;
 }

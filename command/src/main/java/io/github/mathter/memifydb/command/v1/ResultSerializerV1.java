@@ -2,8 +2,6 @@ package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.IOUtil;
 import io.github.mathter.memifydb.command.Result;
-import io.github.mathter.memifydb.common.data.ValueDeserializer;
-import io.github.mathter.memifydb.common.data.ValueSerializer;
 import io.github.mathter.memifydb.common.util.ByteArray;
 
 import java.io.IOException;
@@ -28,7 +26,7 @@ import java.nio.ByteBuffer;
 class ResultSerializerV1 implements io.github.mathter.memifydb.command.ResultSerializer {
     private boolean write(OutputStream os, ValueResult result) throws IOException {
         final byte[] prefix = result.getPrefix();
-        final byte[] rawValue = result.getRawValue();
+        final byte[] rawValue = result.getValue().getRaw();
 
         os.write(prefix);
         os.write(IOUtil.write(result.getSequenceNumber()));
@@ -38,42 +36,23 @@ class ResultSerializerV1 implements io.github.mathter.memifydb.command.ResultSer
         return true;
     }
 
-    private ByteBuffer write(ValueResult result) throws IOException {
+
+    private boolean write(OutputStream os, VoidResult result) throws IOException {
         final byte[] prefix = result.getPrefix();
-        final byte[] sequenceNumberBuf = IOUtil.write(result.getSequenceNumber());
-        final byte[] rawValue = result.getRawValue();
-        final ByteBuffer buf = ByteBuffer.allocate(
-                prefix.length
-                        + sequenceNumberBuf.length
-                        + Integer.BYTES
-                        + rawValue.length
-        );
+        os.write(prefix);
+        os.write(IOUtil.write(result.getSequenceNumber()));
 
-        buf.put(prefix);
-        buf.put(sequenceNumberBuf);
-        buf.putInt(rawValue.length);
-        buf.put(rawValue);
-
-        return buf;
+        return true;
     }
 
     @Override
     public boolean serialize(OutputStream os, Result result) throws IOException {
         return switch (result) {
             case ValueResult rst -> write(os, rst);
+            case VoidResult rst -> write(os, rst);
             default -> throw new IllegalStateException(
                     String.format("Unknown result type: %s", result)
             );
         };
-    }
-
-    @Override
-    public ByteBuffer serialize(Result result) throws IOException {
-        return (switch (result) {
-            case ValueResult rst -> write(rst);
-            default -> throw new IllegalStateException(
-                    String.format("Unknown result type: %s", result)
-            );
-        }).rewind();
     }
 }

@@ -1,9 +1,6 @@
-package io.github.mathter.memifydb.universe.simple.v1;
+package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.Result;
-import io.github.mathter.memifydb.command.v1.XaRollbackTransactionCommand;
-import io.github.mathter.memifydb.universe.Context;
-import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
+import io.github.mathter.memifydb.command.SequenceNumber;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -20,9 +17,21 @@ import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class XaRollbackTransactionCommandProcessor implements CommandProcessor<XaRollbackTransactionCommand> {
-    @Override
-    public Result process(Context context, XaRollbackTransactionCommand command) {
-        throw new UnsupportedOperationException("Not supported yet.");
+public class XaRecoverTransactionCommand extends AbstractCommand {
+    private static final byte[] PREFIX = {0x0A, 0x0F};
+
+    final int flags;
+
+    public XaRecoverTransactionCommand(SequenceNumber sequenceNumber, int flags) {
+        super(sequenceNumber);
+        this.flags = flags;
+    }
+
+    public static byte[] getPrefix() {
+        return PREFIX;
+    }
+
+    public int getFlags() {
+        return flags;
     }
 }

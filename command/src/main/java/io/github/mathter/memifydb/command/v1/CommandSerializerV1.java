@@ -78,6 +78,7 @@ class CommandSerializerV1 implements CommandSerializer {
         os.write(XaCommitTransactionCommand.getPrefix());
         IOUtil.write(os, command.getSequenceNumber());
         IOUtil.write(os, command.getXid());
+        os.write((byte) (command.isOnePhase() ? 1 : 0));
 
         return true;
     }
@@ -111,6 +112,14 @@ class CommandSerializerV1 implements CommandSerializer {
         return true;
     }
 
+    private boolean write(OutputStream os, XaRecoverTransactionCommand command) throws IOException {
+        os.write(XaRecoverTransactionCommand.getPrefix());
+        IOUtil.write(os, command.getSequenceNumber());
+        ByteArray.writeIntRaw(os, command.getFlags());
+
+        return true;
+    }
+
     private boolean write(OutputStream os, PutCommand command) throws IOException {
         os.write(PutCommand.getPrefix());
         IOUtil.write(os, command.getSequenceNumber());
@@ -130,6 +139,15 @@ class CommandSerializerV1 implements CommandSerializer {
         return true;
     }
 
+    private boolean write(OutputStream os, GetCommand command) throws IOException {
+        os.write(GetCommand.getPrefix());
+        IOUtil.write(os, command.getSequenceNumber());
+        IOUtil.write(os, this.valueSerializer.serialize(command.getSpaceName()));
+        IOUtil.write(os, this.valueSerializer.serialize(command.getKey()));
+
+        return true;
+    }
+
     @Override
     public boolean serialize(OutputStream os, Command command) throws IOException {
         return switch (command) {
@@ -139,8 +157,10 @@ class CommandSerializerV1 implements CommandSerializer {
             case XaCommitTransactionCommand cmd -> write(os, cmd);
             case XaRollbackTransactionCommand cmd -> write(os, cmd);
             case XaWrapperCommand<?> cmd -> write(os, cmd);
+            case XaRecoverTransactionCommand cmd -> write(os, cmd);
             case PutCommand cmd -> write(os, cmd);
             case RemoveCommand cmd -> write(os, cmd);
+            case GetCommand cmd -> write(os, cmd);
             default -> false;
         };
     }

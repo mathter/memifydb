@@ -1,6 +1,7 @@
 package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.common.data.Value;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -17,23 +18,28 @@ import io.github.mathter.memifydb.command.SequenceNumber;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ExceptionResult extends AbstractResult {
-    private final String text;
+public class GetCommand extends AbstractCommand {
+    private static final byte[] PREFIX = {0x01, 0x0C};
 
-    public ExceptionResult(SequenceNumber sequenceNumber, String text) {
+    private final String spaceName;
+
+    private final Value key;
+
+    public GetCommand(SequenceNumber sequenceNumber, String spaceName, Value key) {
         super(sequenceNumber);
-        this.text = text;
+        this.spaceName = spaceName;
+        this.key = key;
     }
 
-    public String getText() {
-        return text;
+    public static byte[] getPrefix() {
+        return PREFIX;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("ExceptionResult{");
-        sb.append("text='").append(text).append('\'');
-        sb.append('}');
-        return sb.toString();
+    public String getSpaceName() {
+        return spaceName;
+    }
+
+    public Value getKey() {
+        return key;
     }
 }

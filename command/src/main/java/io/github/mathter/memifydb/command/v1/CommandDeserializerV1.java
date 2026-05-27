@@ -42,7 +42,9 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
                 new Key(XaRollbackTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRollbackTransactionCommand,
                 new Key(XaWrapperCommand.getPrefix()), CommandDeserializerV1::readXaWrapperCommand,
                 new Key(PutCommand.getPrefix()), CommandDeserializerV1::readPutCommand,
-                new Key(RemoveCommand.getPrefix()), CommandDeserializerV1::readRemoveCommand
+                new Key(RemoveCommand.getPrefix()), CommandDeserializerV1::readRemoveCommand,
+                new Key(GetCommand.getPrefix()), CommandDeserializerV1::readGetCommand,
+                new Key(XaRecoverTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRecoverCommand
         );
     }
 
@@ -97,7 +99,8 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
     private XaCommitTransactionCommand readXaCommitTransactionCommand(InputStream is) throws IOException {
         return new XaCommitTransactionCommand(
                 IOUtil.readSequenceNumber(is),
-                IOUtil.readXid(is)
+                IOUtil.readXid(is),
+                is.readNBytes(1)[0] != 0
         );
     }
 
@@ -116,6 +119,13 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
         );
     }
 
+    private XaRecoverTransactionCommand readXaRecoverCommand(InputStream is) throws IOException {
+        return new XaRecoverTransactionCommand(
+                IOUtil.readSequenceNumber(is),
+                ByteArray.readIntRaw(is)
+        );
+    }
+
     private PutCommand readPutCommand(InputStream is) throws IOException {
         return new PutCommand(
                 IOUtil.readSequenceNumber(is),
@@ -127,6 +137,14 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
 
     private RemoveCommand readRemoveCommand(InputStream is) throws IOException {
         return new RemoveCommand(
+                IOUtil.readSequenceNumber(is),
+                this.valueDeserializer.deserialize(IOUtil.read(is)).get(),
+                this.valueDeserializer.deserialize(IOUtil.read(is))
+        );
+    }
+
+    private GetCommand readGetCommand(InputStream is) throws IOException {
+        return new GetCommand(
                 IOUtil.readSequenceNumber(is),
                 this.valueDeserializer.deserialize(IOUtil.read(is)).get(),
                 this.valueDeserializer.deserialize(IOUtil.read(is))

@@ -94,10 +94,14 @@ class XaResource implements XAResource, XaResourceProvider<KeyValueOperations>, 
 
         final XaOperations op = map.computeIfAbsent(xid, x -> new XaOperations(x));
 
-        if (System.currentTimeMillis() - op.created >= this.transactionTimeout) {
-            throw new IllegalStateException(
-                    String.format("Transaction timed out! xid=%s, resource=%s", xid, this)
-            );
+        if (op != null) {
+            if (System.currentTimeMillis() - op.created >= this.transactionTimeout) {
+                throw new IllegalStateException(
+                        String.format("Transaction timed out! xid=%s, resource=%s", xid, this)
+                );
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("Transaction for xid=%s not started! resource=%s", xid, this));
         }
 
         return op;
@@ -243,7 +247,7 @@ class XaResource implements XAResource, XaResourceProvider<KeyValueOperations>, 
             throw new XaException(String.format("xid must not be null! flags=%s, resource=%s", flags, this), XAException.XAER_INVAL);
         }
 
-        final XaOperations op = map.get(xid);
+        final XaOperations op = map.computeIfAbsent(xid, x -> new XaOperations(x));
 
         if (op == null) {
             throw new XaException(String.format("%s not valid! There is no resource! resource=%s", xid, this), XAException.XAER_RMERR);
@@ -342,7 +346,8 @@ class XaResource implements XAResource, XaResourceProvider<KeyValueOperations>, 
             final Opt<Value> result;
 
             if (this.status == Status.STARTED) {
-                result = this.map.put(key, Opt.of(value));
+                final Opt<Value> existing = this.map.put(key, Opt.of(value));
+                result = existing != null ? existing : Opt.empty();
             } else {
                 throw new IllegalStateException(
                         String.format(

@@ -31,4 +31,6 @@ public interface Context {
     public ValueTranslator getTranslator();
 
     public Xid getXid();
+
+    public void setXid(Xid xid);
 }

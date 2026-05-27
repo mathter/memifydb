@@ -49,7 +49,6 @@ public class PutCommandTest {
 
         this.universe = UniverseFactory.getInstance(io.github.mathter.memifydb.universe.simple.Const.ID)
                 .newInstance(
-                        io.github.mathter.memifydb.universe.simple.Const.ID,
                         Map.of(
                                 io.github.mathter.memifydb.universe.simple.Const.PROPERTY_SPACES, List.of(space),
                                 io.github.mathter.memifydb.universe.simple.Const.PROPERTY_VALUE_FACTORY, VALUE_FACTORY
@@ -71,13 +70,13 @@ public class PutCommandTest {
 
         ValueResult processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNull(processed.getRawValue());
+        Assertions.assertNull(processed.getValue());
 
         processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNotNull(processed.getRawValue());
+        Assertions.assertNotNull(processed.getValue());
 
-        final Value val = VALUE_FACTORY.deserializer().deserialize(processed.getRawValue());
+        final Value val = processed.getValue();
         Assertions.assertNotNull(val);
         Assertions.assertEquals(value, val.get());
     }

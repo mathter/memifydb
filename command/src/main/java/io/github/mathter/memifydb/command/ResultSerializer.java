@@ -21,6 +21,4 @@ import java.nio.ByteBuffer;
  */
 public interface ResultSerializer {
     public boolean serialize(OutputStream os, Result result) throws IOException;
-
-    public ByteBuffer serialize(Result result) throws IOException;
 }

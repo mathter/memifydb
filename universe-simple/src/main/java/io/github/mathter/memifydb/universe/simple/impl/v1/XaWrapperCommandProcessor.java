@@ -1,10 +1,16 @@
-package io.github.mathter.memifydb.universe.simple.v1;
+package io.github.mathter.memifydb.universe.simple.impl.v1;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
+import io.github.mathter.memifydb.command.v1.ExceptionResult;
+import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.XaWrapperCommand;
 import io.github.mathter.memifydb.universe.Context;
 import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
+
+import javax.transaction.xa.Xid;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -22,8 +28,28 @@ import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
  * limitations under the License.
  */
 public class XaWrapperCommandProcessor<T extends Command> implements CommandProcessor<XaWrapperCommand<T>> {
+    private static final Logger LOG = Logger.getLogger(XaWrapperCommandProcessor.class.getName());
+
     @Override
     public Result process(Context context, XaWrapperCommand<T> command) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Result result;
+        LOG.log(Level.FINER, "Processing command {0}", command);
+        try {
+            final Xid xid = command.getXid();
+            final Command wrapped = command.getCommand();
+
+            context.setXid(xid);
+            result = context.getUniverse().process(context, wrapped);
+        } catch (Throwable t) {
+            LOG.log(
+                    Level.SEVERE,
+                    String.format("Error processing command: %s", command),
+                    t
+            );
+
+            result = new ExceptionResult(command.getSequenceNumber(), t.toString());
+        }
+
+        return result;
     }
 }

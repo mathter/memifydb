@@ -3,10 +3,14 @@ package io.github.mathter.memifydb.universe;
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.common.data.Value;
+import io.github.mathter.memifydb.common.data.ValueFactory;
 import io.github.mathter.memifydb.space.Operations;
 import io.github.mathter.memifydb.space.Space;
 
 import javax.transaction.xa.XAException;
+import javax.transaction.xa.XAResource;
+import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 /**
@@ -27,7 +31,16 @@ import java.util.UUID;
 public interface Universe {
     public UUID getId();
 
-    public <T extends Operations> Space<T> getSpace(String spaceName);
+    public Collection<Space<?>> getSpaces();
+
+    public <T extends Operations> Space<T> getSpace(String spaceName) throws NoSuchElementException;
 
     public <R extends Result> R process(Command command) throws XAException;
+
+    public <R extends Result> R process(Context context, Command command) throws XAException;
+
+
+    public ValueFactory getValueFactory();
+
+    public XAResource getXAResource();
 }

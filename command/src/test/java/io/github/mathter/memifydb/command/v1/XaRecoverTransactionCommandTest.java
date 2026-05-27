@@ -9,9 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -28,22 +25,20 @@ import java.nio.channels.ReadableByteChannel;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class XaCommitTransactionCommandTest extends AbstractCommadTest {
+public class XaRecoverTransactionCommandTest extends AbstractCommadTest {
     @Test
-    public void test() throws IOException {
+    public void testStreamChannel() throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final int flags = RandomUtils.nextInt();
         final SequenceNumber sequenceNumber = new SequenceNumber(RandomUtils.nextInt());
-        final Xid xid = Xid.of(0, RandomUtils.nextBytes(10), RandomUtils.nextBytes(10));
-        final XaCommitTransactionCommand command = new XaCommitTransactionCommand(sequenceNumber, xid, true);
+        final XaRecoverTransactionCommand command = new XaRecoverTransactionCommand(sequenceNumber, flags);
 
         this.serializer.serialize(baos, command);
 
-        final InputStream is = new ByteArrayInputStream(baos.toByteArray());
+        final ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        final XaCommitTransactionCommand deserializedCommand = this.deserializer.deserialize(is);
+        final XaRecoverTransactionCommand deserializedCommand = this.deserializer.deserialize(is);
         Assertions.assertNotNull(deserializedCommand);
-        Assertions.assertEquals(sequenceNumber, deserializedCommand.getSequenceNumber());
-        Assertions.assertEquals(xid, deserializedCommand.getXid());
-        Assertions.assertEquals(true, deserializedCommand.isOnePhase());
+        Assertions.assertEquals(flags, deserializedCommand.getFlags());
     }
 }

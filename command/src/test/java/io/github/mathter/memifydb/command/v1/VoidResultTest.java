@@ -1,8 +1,7 @@
 package io.github.mathter.memifydb.command.v1;
 
+import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.SequenceNumber;
-import io.github.mathter.memifydb.common.data.Value;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,21 +11,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ValueResultTest extends AbstractResultTest {
+public class VoidResultTest extends AbstractResultTest {
     @Test
-    public void testStreamChannel() throws IOException {
+    public void test() throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final SequenceNumber sequenceNumber = new SequenceNumber(RandomUtils.nextInt());
-        final String value = RandomStringUtils.randomAlphanumeric(10);
-        final Value val = this.valueTranslator.from(value);
-        final ValueResult result = new ValueResult(sequenceNumber, val);
+        final Result result = new VoidResult(sequenceNumber);
 
         this.serializer.serialize(baos, result);
-
         final InputStream is = new ByteArrayInputStream(baos.toByteArray());
-        final ValueResult deserializedResult = this.deserializer.deserialize(is);
+        final Result deserializedResult = this.deserializer.deserialize(is);
         Assertions.assertNotNull(deserializedResult);
         Assertions.assertEquals(sequenceNumber, deserializedResult.getSequenceNumber());
-        Assertions.assertEquals(val, deserializedResult.getValue());
     }
 }

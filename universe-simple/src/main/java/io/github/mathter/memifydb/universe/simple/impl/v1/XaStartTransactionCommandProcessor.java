@@ -1,9 +1,13 @@
-package io.github.mathter.memifydb.universe.simple.v1;
+package io.github.mathter.memifydb.universe.simple.impl.v1;
 
 import io.github.mathter.memifydb.command.Result;
+import io.github.mathter.memifydb.command.v1.ExceptionResult;
+import io.github.mathter.memifydb.command.v1.VoidResult;
 import io.github.mathter.memifydb.command.v1.XaStartTransactionCommand;
 import io.github.mathter.memifydb.universe.Context;
 import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
+
+import javax.transaction.xa.Xid;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -23,6 +27,14 @@ import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;
 public class XaStartTransactionCommandProcessor implements CommandProcessor<XaStartTransactionCommand> {
     @Override
     public Result process(Context context, XaStartTransactionCommand command) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final Xid xid = command.getXid();
+        final int flags = command.getFlags();
+
+        try {
+            context.getUniverse().getXAResource().start(xid, flags);
+            return new VoidResult(command.getSequenceNumber());
+        } catch (Throwable t) {
+            return new ExceptionResult(command.getSequenceNumber(), t.toString());
+        }
     }
 }

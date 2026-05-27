@@ -9,6 +9,7 @@ import io.github.mathter.memifydb.universe.simple.Const;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class SImpleUniverseFactory extends UniverseFactory {
     }
 
     @Override
-    public Universe newInstance(String id, Map<?, ?> properties) {
+    public Universe newInstance(Map<?, ?> properties) {
         return new SimpleUniverse(
                 buildId(properties),
                 buildValueFactory(properties),
@@ -54,7 +55,7 @@ public class SImpleUniverseFactory extends UniverseFactory {
             } else if (idObject instanceof UUID uuid) {
                 result = uuid;
             } else {
-                throw new IllegalStateException(String.format("'%s' is not valid uuid"));
+                throw new IllegalStateException(String.format("'%s' is not valid uuid", idObject));
             }
         } else {
             result = UUID.randomUUID();
@@ -73,7 +74,7 @@ public class SImpleUniverseFactory extends UniverseFactory {
             } else if (idObject instanceof ValueFactory valueFactory) {
                 result = valueFactory;
             } else {
-                throw new IllegalStateException(String.format("'%s' is not valid valueFactory"));
+                throw new IllegalStateException(String.format("'%s' is not valid valueFactory", idObject));
             }
         } else {
             result = ValueFactory.get(FasterXmlValueFactory.ID);
@@ -93,15 +94,15 @@ public class SImpleUniverseFactory extends UniverseFactory {
                             if (e instanceof Space) {
                                 return (Space<?>) e;
                             } else {
-                                throw new IllegalStateException(String.format("'%s' is not valid space"));
+                                throw new IllegalStateException(String.format("'%s' is not valid space", idObject));
                             }
                         })
                         .collect(Collectors.toCollection(ArrayList::new));
             } else {
-                throw new IllegalStateException(String.format("'%s' is not valid space"));
+                throw new IllegalStateException(String.format("'%s' is not valid space", idObject));
             }
         } else {
-            throw new IllegalStateException(String.format("'%s' is not valid spaces"));
+            result = Collections.emptyList();
         }
 
         return result;

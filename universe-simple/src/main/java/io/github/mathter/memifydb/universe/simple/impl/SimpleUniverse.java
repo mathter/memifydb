@@ -2,15 +2,17 @@ package io.github.mathter.memifydb.universe.simple.impl;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
+import io.github.mathter.memifydb.command.v1.GetCommand;
 import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.RemoveCommand;
 import io.github.mathter.memifydb.command.v1.XaCommitTransactionCommand;
 import io.github.mathter.memifydb.command.v1.XaEndTransactionCommand;
 import io.github.mathter.memifydb.command.v1.XaPrepareTransactionCommand;
+import io.github.mathter.memifydb.command.v1.XaRecoverTransactionCommand;
 import io.github.mathter.memifydb.command.v1.XaRollbackTransactionCommand;
 import io.github.mathter.memifydb.command.v1.XaStartTransactionCommand;
+import io.github.mathter.memifydb.command.v1.XaWrapperCommand;
 import io.github.mathter.memifydb.command.xa.XaCommand;
-import io.github.mathter.memifydb.common.data.Value;
 import io.github.mathter.memifydb.common.data.ValueDeserializer;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 import io.github.mathter.memifydb.common.data.ValueSerializer;
@@ -19,18 +21,24 @@ import io.github.mathter.memifydb.space.Operations;
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.universe.Context;
 import io.github.mathter.memifydb.universe.Universe;
-import io.github.mathter.memifydb.universe.simple.v1.PutCommadProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.RemoveCommadProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.XaCommitTransactionCommandProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.XaEndTransactionCommandProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.XaPrepareTransactionCommandProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.XaRollbackTransactionCommandProcessor;
-import io.github.mathter.memifydb.universe.simple.v1.XaStartTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.GetCommadProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.PutCommadProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.RemoveCommadProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaCommitTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaEndTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaPrepareTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaRecoverTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaRollbackTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaStartTransactionCommandProcessor;
+import io.github.mathter.memifydb.universe.simple.impl.v1.XaWrapperCommandProcessor;
 
 import javax.transaction.xa.XAException;
+import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -57,6 +65,10 @@ class SimpleUniverse implements Universe {
 
     private final Map<String, Space<?>> spaces;
 
+    private final XAResource xaResource = new XaResource(this);
+
+    private final ValueFactory valueFactory;
+
     private final ValueSerializer valueSerializer;
 
     private final ValueDeserializer valueDeserializer;
@@ -66,6 +78,8 @@ class SimpleUniverse implements Universe {
     private final PutCommadProcessor putCommadProcessor = new PutCommadProcessor();
 
     private final RemoveCommadProcessor removeCommadProcessor = new RemoveCommadProcessor();
+
+    private final GetCommadProcessor getCommadProcessor = new GetCommadProcessor();
 
     private final XaStartTransactionCommandProcessor xaStartTransactionCommandProcessor = new XaStartTransactionCommandProcessor();
 
@@ -77,6 +91,10 @@ class SimpleUniverse implements Universe {
 
     private final XaRollbackTransactionCommandProcessor xaRollbackTransactionCommandProcessor = new XaRollbackTransactionCommandProcessor();
 
+    private final XaWrapperCommandProcessor xaWrapperCommandProcessor = new XaWrapperCommandProcessor();
+
+    private final XaRecoverTransactionCommandProcessor xaRecoverTransactionCommandProcessor = new XaRecoverTransactionCommandProcessor();
+
     public SimpleUniverse(UUID id, ValueFactory valueFactory, Collection<Space<?>> spaces) {
         this.id = id;
         this.spaces = Optional.ofNullable(spaces)
@@ -87,6 +105,7 @@ class SimpleUniverse implements Universe {
                         Function.identity())
                 );
 
+        this.valueFactory = valueFactory;
         this.valueSerializer = valueFactory.serializer();
         this.valueDeserializer = valueFactory.deserializer();
         this.valueTranslator = valueFactory.translator();
@@ -98,9 +117,20 @@ class SimpleUniverse implements Universe {
     }
 
     @Override
+    public Collection<Space<?>> getSpaces() {
+        return List.copyOf(this.spaces.values());
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends Operations> Space<T> getSpace(String spaceName) {
-        return (Space<T>) this.spaces.get(spaceName);
+        final Space<T> space = (Space<T>) this.spaces.get(spaceName);
+
+        if (space != null) {
+            return space;
+        } else {
+            throw new NoSuchElementException("Space not found: " + spaceName);
+        }
     }
 
     @Override
@@ -109,22 +139,36 @@ class SimpleUniverse implements Universe {
         return this.process(new ContextImpl(xid), command);
     }
 
+    @Override
+    public ValueFactory getValueFactory() {
+        return this.valueFactory;
+    }
+
+    @Override
+    public XAResource getXAResource() {
+        return this.xaResource;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <R extends Result> R process(Context context, Command command) throws XAException {
         return (R) switch (command) {
             case PutCommand cmd -> this.putCommadProcessor.process(context, cmd);
             case RemoveCommand cmd -> this.removeCommadProcessor.process(context, cmd);
+            case GetCommand cmd -> this.getCommadProcessor.process(context, cmd);
             case XaStartTransactionCommand cmd -> this.xaStartTransactionCommandProcessor.process(context, cmd);
             case XaEndTransactionCommand cmd -> this.xaEndTransactionCommandProcessor.process(context, cmd);
             case XaPrepareTransactionCommand cmd -> this.xaPrepareTransactionCommandProcessor.process(context, cmd);
             case XaCommitTransactionCommand cmd -> this.xaCommitTransactionCommandProcessor.process(context, cmd);
             case XaRollbackTransactionCommand cmd -> this.xaRollbackTransactionCommandProcessor.process(context, cmd);
+            case XaWrapperCommand<?> cmd -> this.xaWrapperCommandProcessor.process(context, cmd);
+            case XaRecoverTransactionCommand cmd -> this.xaRecoverTransactionCommandProcessor.process(context, cmd);
             default -> throw new UnsupportedOperationException("Unsupported command: " + command);
         };
     }
 
     private class ContextImpl implements Context {
-        private final Xid xid;
+        private Xid xid;
 
         private ContextImpl(Xid xid) {
             this.xid = xid;
@@ -148,6 +192,11 @@ class SimpleUniverse implements Universe {
         @Override
         public Xid getXid() {
             return this.xid;
+        }
+
+        @Override
+        public void setXid(Xid xid) {
+            this.xid = xid;
         }
 
         @Override

@@ -40,9 +40,5 @@ public abstract class UniverseFactory {
      */
     public abstract String id();
 
-    public Universe newInstance(String id) {
-        return this.newInstance(id, null);
-    }
-
-    public abstract Universe newInstance(String id, Map<?, ?> properties);
+    public abstract Universe newInstance(Map<?, ?> properties);
 }

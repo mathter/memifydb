@@ -1,7 +1,8 @@
-package io.github.mathter.memifydb.universe.simple.v1;
+package io.github.mathter.memifydb.universe.simple.impl.v1;
 
 import io.github.mathter.memifydb.command.Result;
-import io.github.mathter.memifydb.command.v1.PutCommand;
+import io.github.mathter.memifydb.command.v1.GetCommand;
+import io.github.mathter.memifydb.command.v1.RemoveCommand;
 import io.github.mathter.memifydb.command.v1.ValueResult;
 import io.github.mathter.memifydb.common.data.Value;
 import io.github.mathter.memifydb.common.util.Opt;
@@ -28,12 +29,11 @@ import javax.transaction.xa.Xid;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class PutCommadProcessor implements CommandProcessor<PutCommand> {
+public class GetCommadProcessor implements CommandProcessor<GetCommand> {
     @Override
-    public Result process(Context context, PutCommand command) {
+    public Result process(Context context, GetCommand command) {
         final String spaceName = command.getSpaceName();
         final Value key = command.getKey();
-        final Value value = command.getValue();
 
         final Xid xid = context.getXid();
         final Universe universe = context.getUniverse();
@@ -46,13 +46,8 @@ public class PutCommadProcessor implements CommandProcessor<PutCommand> {
             operations = space.xaResource().xa(xid);
         }
 
-        final Opt<Value> opt = operations.put(key, value);
+        final Opt<Value> opt = operations.get(key);
 
-        return new ValueResult(
-                command.getSequenceNumber(),
-                opt.isPresent()
-                        ? context.getSerializer().serialize(opt.get())
-                        : null
-        );
+        return new ValueResult(command.getSequenceNumber(), opt.orElse(null));
     }
 }

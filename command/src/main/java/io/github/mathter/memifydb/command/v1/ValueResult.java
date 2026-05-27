@@ -19,18 +19,20 @@ import io.github.mathter.memifydb.common.data.Value;
  * limitations under the License.
  */
 public class ValueResult extends AbstractResult {
-    private final byte[] rawValue;
+    private static final byte[] PREFIX = {0x01, 0x00};
 
-    public ValueResult(SequenceNumber sequenceNumber, byte[] rawValue) {
+    private final Value value;
+
+    public ValueResult(SequenceNumber sequenceNumber, Value value) {
         super(sequenceNumber);
-        this.rawValue = rawValue;
+        this.value = value;
     }
 
     public static byte[] getPrefix() {
-        return PutCommand.getPrefix();
+        return PREFIX;
     }
 
-    public byte[] getRawValue() {
-        return rawValue;
+    public Value getValue() {
+        return this.value;
     }
 }

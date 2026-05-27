@@ -4,6 +4,7 @@ package io.github.mathter.memifydb.command.v1;
 import io.github.mathter.memifydb.command.IOUtil;
 import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.ResultDeserializer;
+import io.github.mathter.memifydb.common.data.ValueDeserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,10 +29,17 @@ import java.util.Map;
 class ResultDeserializerV1 implements ResultDeserializer {
     private static final Map<Key, Reader> map;
 
+    private final ValueDeserializer valueDeserializer;
+
     static {
         map = Map.of(
-                new Key(ValueResult.getPrefix()), ResultDeserializerV1::readPutCommandResult
+                new Key(ValueResult.getPrefix()), ResultDeserializerV1::readValueResult,
+                new Key(VoidResult.getPrefix()), ResultDeserializerV1::readVoidResult
         );
+    }
+
+    public ResultDeserializerV1(ValueDeserializer valueDeserializer) {
+        this.valueDeserializer = valueDeserializer;
     }
 
     @Override
@@ -55,10 +63,16 @@ class ResultDeserializerV1 implements ResultDeserializer {
         return result;
     }
 
-    private ValueResult readPutCommandResult(InputStream is) throws IOException {
+    private ValueResult readValueResult(InputStream is) throws IOException {
         return new ValueResult(
                 IOUtil.readSequenceNumber(is),
-                IOUtil.read(is)
+                this.valueDeserializer.deserialize(IOUtil.read(is))
+        );
+    }
+
+    private VoidResult readVoidResult(InputStream is) throws IOException {
+        return new VoidResult(
+                IOUtil.readSequenceNumber(is)
         );
     }
 

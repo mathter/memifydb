@@ -25,9 +25,12 @@ public class XaCommitTransactionCommand extends AbstractCommand implements XaCom
 
     private final Xid xid;
 
-    public XaCommitTransactionCommand(SequenceNumber sequenceNumber, Xid xid) {
+    private final boolean onePhase;
+
+    public XaCommitTransactionCommand(SequenceNumber sequenceNumber, Xid xid, boolean onePhase) {
         super(sequenceNumber);
         this.xid = xid;
+        this.onePhase = onePhase;
     }
 
     public static byte[] getPrefix() {
@@ -37,5 +40,9 @@ public class XaCommitTransactionCommand extends AbstractCommand implements XaCom
     @Override
     public Xid getXid() {
         return this.xid;
+    }
+
+    public boolean isOnePhase() {
+        return this.onePhase;
     }
 }
