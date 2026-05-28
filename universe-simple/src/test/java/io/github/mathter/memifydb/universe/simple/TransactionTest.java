@@ -41,7 +41,10 @@ public class TransactionTest {
         final Universe universe = UniverseFactory
                 .getInstance(Const.ID)
                 .newInstance(
-                        Map.of(Const.PROPERTY_SPACES, List.of(space))
+                        Map.of(
+                                Const.PROPERTY_NAME, RandomStringUtils.randomAlphabetic(10),
+                                Const.PROPERTY_SPACES, List.of(space)
+                        )
                 );
         final Value key = universe.getValueFactory().translator().from(RandomStringUtils.randomAlphanumeric(16));
         final Value value = universe.getValueFactory().translator().from(RandomStringUtils.randomAlphanumeric(16));
@@ -133,7 +136,10 @@ public class TransactionTest {
         final Universe universe = UniverseFactory
                 .getInstance(Const.ID)
                 .newInstance(
-                        Map.of(Const.PROPERTY_SPACES, List.of(space))
+                        Map.of(
+                                Const.PROPERTY_NAME, RandomStringUtils.randomAlphabetic(10)
+                                , Const.PROPERTY_SPACES, List.of(space)
+                        )
                 );
         final Value key = universe.getValueFactory().translator().from(RandomStringUtils.randomAlphanumeric(16));
         final Value value = universe.getValueFactory().translator().from(RandomStringUtils.randomAlphanumeric(16));

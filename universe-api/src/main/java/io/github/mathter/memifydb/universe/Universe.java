@@ -31,6 +31,8 @@ import java.util.UUID;
 public interface Universe {
     public UUID getId();
 
+    public String getName();
+
     public Collection<Space<?>> getSpaces();
 
     public <T extends Operations> Space<T> getSpace(String spaceName) throws NoSuchElementException;
@@ -38,7 +40,6 @@ public interface Universe {
     public <R extends Result> R process(Command command) throws XAException;
 
     public <R extends Result> R process(Context context, Command command) throws XAException;
-
 
     public ValueFactory getValueFactory();
 

@@ -1,8 +1,5 @@
-package io.github.mathter.memifydb.command.spi;
+package io.github.mathter.memifydb.core.net.socket;
 
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
-
-import java.util.Map;
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -18,8 +15,16 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface ResultSerializationFactoryProvider {
-    public String id();
+public class Const {
+    public static final String ID = "simple-socket";
 
-    public ResultSerializationFactory provide(Map<?, ?> properties);
+    public static final String PROPERTY_ADDRESS = "address";
+
+    public static final String PROPERTY_PORT = "port";
+
+    public static final String PROPERTY_BACKLOG = "backlog";
+
+    public static final String PROPERTY_MAXCONNECTIONCOUNT = "maxConnectionCount";
+
+    public static final String PROPERTY_UNIVERSES = "universes";
 }

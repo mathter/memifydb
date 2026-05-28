@@ -22,5 +22,5 @@ import java.util.Map;
 public interface CommandSerializationFactoryProvider {
     public String id();
 
-    public CommandSerializationFactory get(Map<?, ?> properties);
+    public CommandSerializationFactory provide(Map<?, ?> properties);
 }

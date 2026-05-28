@@ -63,6 +63,8 @@ import java.util.stream.Stream;
 class SimpleUniverse implements Universe {
     private final UUID id;
 
+    private final String name;
+
     private final Map<String, Space<?>> spaces;
 
     private final XAResource xaResource = new XaResource(this);
@@ -95,8 +97,9 @@ class SimpleUniverse implements Universe {
 
     private final XaRecoverTransactionCommandProcessor xaRecoverTransactionCommandProcessor = new XaRecoverTransactionCommandProcessor();
 
-    public SimpleUniverse(UUID id, ValueFactory valueFactory, Collection<Space<?>> spaces) {
+    public SimpleUniverse(UUID id, String name, ValueFactory valueFactory, Collection<Space<?>> spaces) {
         this.id = id;
+        this.name = name;
         this.spaces = Optional.ofNullable(spaces)
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
@@ -114,6 +117,11 @@ class SimpleUniverse implements Universe {
     @Override
     public UUID getId() {
         return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     @Override

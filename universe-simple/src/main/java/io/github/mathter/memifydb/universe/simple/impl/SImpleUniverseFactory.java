@@ -39,6 +39,7 @@ public class SImpleUniverseFactory extends UniverseFactory {
     public Universe newInstance(Map<?, ?> properties) {
         return new SimpleUniverse(
                 buildId(properties),
+                buildName(properties),
                 buildValueFactory(properties),
                 buildSpaces(properties)
         );
@@ -59,6 +60,23 @@ public class SImpleUniverseFactory extends UniverseFactory {
             }
         } else {
             result = UUID.randomUUID();
+        }
+
+        return result;
+    }
+
+    private static String buildName(Map<?, ?> properties) {
+        final String result;
+        final Object object;
+
+        if ((object = properties.get(Const.PROPERTY_NAME)) != null) {
+            if (object instanceof String string) {
+                result = string;
+            } else {
+                throw new IllegalStateException(String.format("'%s' is not valid name", object));
+            }
+        } else {
+            throw new IllegalStateException(String.format("'%s' is not valid name", properties.get(Const.PROPERTY_NAME)));
         }
 
         return result;

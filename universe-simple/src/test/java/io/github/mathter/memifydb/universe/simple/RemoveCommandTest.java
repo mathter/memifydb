@@ -51,6 +51,7 @@ public class RemoveCommandTest {
         this.universe = UniverseFactory.getInstance(io.github.mathter.memifydb.universe.simple.Const.ID)
                 .newInstance(
                         Map.of(
+                                io.github.mathter.memifydb.universe.simple.Const.PROPERTY_NAME, RandomStringUtils.randomAlphabetic(10),
                                 io.github.mathter.memifydb.universe.simple.Const.PROPERTY_SPACES, List.of(space),
                                 io.github.mathter.memifydb.universe.simple.Const.PROPERTY_VALUE_FACTORY, VALUE_FACTORY
                         )

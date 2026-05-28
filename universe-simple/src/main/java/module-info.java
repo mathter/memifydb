@@ -1,7 +1,7 @@
 import io.github.mathter.memifydb.universe.UniverseFactory;
 import io.github.mathter.memifydb.universe.simple.impl.SImpleUniverseFactory;
 
-module universe.simple {
+module io.github.mathter.memifydb.universe.simple {
     requires org.apache.commons.lang3;
     requires io.github.mathter.memifydb.universe.api;
     requires io.github.mathter.memifydb.common;

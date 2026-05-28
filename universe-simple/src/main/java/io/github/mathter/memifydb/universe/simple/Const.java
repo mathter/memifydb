@@ -22,6 +22,8 @@ public interface Const {
 
     public static final String PROPERTY_ID = "id";
 
+    public static final String PROPERTY_NAME = "name";
+
     public static final String PROPERTY_VALUE_FACTORY = "value-factory";
 
     public static final String PROPERTY_SPACES = "spaces";

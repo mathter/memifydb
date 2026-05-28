@@ -18,7 +18,7 @@ public class ResultSerializationFactoryProviderV1 implements ResultSerialization
     }
 
     @Override
-    public ResultSerializationFactory get(Map<?, ?> properties) {
+    public ResultSerializationFactory provide(Map<?, ?> properties) {
         return new ResultSerializationFactoryV1(buildValueFactory(properties));
     }
 

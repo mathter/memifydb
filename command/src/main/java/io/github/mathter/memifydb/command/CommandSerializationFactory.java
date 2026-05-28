@@ -3,8 +3,6 @@ package io.github.mathter.memifydb.command;
 import io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -33,7 +31,7 @@ public abstract class CommandSerializationFactory {
 
         for (CommandSerializationFactoryProvider provider : serviceLoader) {
             if (id.equals(provider.id())) {
-                return provider.get(properties);
+                return provider.provide(properties);
             }
         }
 

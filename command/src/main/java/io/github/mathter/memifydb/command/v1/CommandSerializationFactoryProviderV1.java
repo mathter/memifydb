@@ -33,7 +33,7 @@ public class CommandSerializationFactoryProviderV1 implements CommandSerializati
     }
 
     @Override
-    public CommandSerializationFactory get(Map<?, ?> properties) {
+    public CommandSerializationFactory provide(Map<?, ?> properties) {
         return new CommandSerializationFactoryV1(buildValueFactory(properties));
     }
 

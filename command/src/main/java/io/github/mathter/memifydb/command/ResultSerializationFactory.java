@@ -35,7 +35,7 @@ public abstract class ResultSerializationFactory {
 
         for (ResultSerializationFactoryProvider provider : loader) {
             if (id.equals(provider.id())) {
-                return provider.get(properties);
+                return provider.provide(properties);
             }
         }
 

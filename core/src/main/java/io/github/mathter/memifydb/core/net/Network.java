@@ -1,8 +1,7 @@
-package io.github.mathter.memifydb.command.spi;
+package io.github.mathter.memifydb.core.net;
 
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import java.io.IOException;
 
-import java.util.Map;
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -18,8 +17,6 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface ResultSerializationFactoryProvider {
-    public String id();
-
-    public ResultSerializationFactory provide(Map<?, ?> properties);
+public interface Network extends AutoCloseable {
+    public void start() throws IOException;
 }

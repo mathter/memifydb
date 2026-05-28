@@ -20,6 +20,8 @@
         <module>universe-api</module>
         <module>universe-simple</module>
         <module>command</module>
+        <module>client</module>
+        <module>core</module>
     </modules>
 
     <properties>
