@@ -70,7 +70,7 @@ class Task implements Runnable {
         switch (command) {
             case SelectUniverseCommand cmd -> process(cmd);
             case ByCommand cmd -> process(cmd);
-            default -> throw new IOException("Unknown command: " + command);
+            default -> this.socketNetwork.universe.process(command);
         }
     }
 

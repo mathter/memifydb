@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.universe.simple;
 
+import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.SequenceNumber;
 import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.ValueResult;
@@ -69,15 +70,16 @@ public class PutCommandTest {
                 VALUE_FACTORY.translator().from(value)
         );
 
-        ValueResult processed = this.universe.process(command);
+        Result processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNull(processed.getValue());
+        Assertions.assertTrue(processed instanceof ValueResult);
+        Assertions.assertNull(((ValueResult) processed).getValue());
 
         processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNotNull(processed.getValue());
+        Assertions.assertNotNull(((ValueResult) processed).getValue());
 
-        final Value val = processed.getValue();
+        final Value val = ((ValueResult) processed).getValue();
         Assertions.assertNotNull(val);
         Assertions.assertEquals(value, val.get());
     }

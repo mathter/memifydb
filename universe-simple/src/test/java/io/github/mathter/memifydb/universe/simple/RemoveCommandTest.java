@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.universe.simple;
 
+import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.SequenceNumber;
 import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.RemoveCommand;
@@ -75,16 +76,18 @@ public class RemoveCommandTest {
                 VALUE_FACTORY.translator().from(key)
         );
 
-        ValueResult processed = this.universe.process(command);
+        Result processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNull(processed.getValue());
+        Assertions.assertNotNull(processed instanceof ValueResult);
+        Assertions.assertNull(((ValueResult) processed).getValue());
 
         this.universe.process(putCommand);
         processed = this.universe.process(command);
         Assertions.assertNotNull(processed);
-        Assertions.assertNotNull(processed.getValue());
+        Assertions.assertNotNull(processed instanceof ValueResult);
+        Assertions.assertNotNull(((ValueResult) processed).getValue());
 
-        final Value val = processed.getValue();
+        final Value val = ((ValueResult) processed).getValue();
         Assertions.assertNotNull(val);
         Assertions.assertEquals(value, val.get());
     }

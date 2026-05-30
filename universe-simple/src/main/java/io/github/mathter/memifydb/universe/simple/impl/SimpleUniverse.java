@@ -2,6 +2,7 @@ package io.github.mathter.memifydb.universe.simple.impl;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
+import io.github.mathter.memifydb.command.v1.ExceptionResult;
 import io.github.mathter.memifydb.command.v1.GetCommand;
 import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.RemoveCommand;
@@ -32,7 +33,6 @@ import io.github.mathter.memifydb.universe.simple.impl.v1.XaRollbackTransactionC
 import io.github.mathter.memifydb.universe.simple.impl.v1.XaStartTransactionCommandProcessor;
 import io.github.mathter.memifydb.universe.simple.impl.v1.XaWrapperCommandProcessor;
 
-import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 import java.util.Collection;
@@ -142,12 +142,6 @@ class SimpleUniverse implements Universe {
     }
 
     @Override
-    public <R extends Result> R process(Command command) throws XAException {
-        final Xid xid = command instanceof XaCommand ? ((XaCommand) command).getXid() : null;
-        return this.process(new ContextImpl(xid), command);
-    }
-
-    @Override
     public ValueFactory getValueFactory() {
         return this.valueFactory;
     }
@@ -158,9 +152,22 @@ class SimpleUniverse implements Universe {
     }
 
     @Override
+    public Result process(Command command) {
+        Result result;
+        try {
+            final Xid xid = command instanceof XaCommand ? ((XaCommand) command).getXid() : null;
+            result = this.process(new ContextImpl(xid), command);
+        } catch (Throwable t) {
+            result = new ExceptionResult(command.getSequenceNumber(), t.toString());
+        }
+
+        return result;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public <R extends Result> R process(Context context, Command command) throws XAException {
-        return (R) switch (command) {
+    public Result process(Context context, Command command) {
+        return switch (command) {
             case PutCommand cmd -> this.putCommadProcessor.process(context, cmd);
             case RemoveCommand cmd -> this.removeCommadProcessor.process(context, cmd);
             case GetCommand cmd -> this.getCommadProcessor.process(context, cmd);
