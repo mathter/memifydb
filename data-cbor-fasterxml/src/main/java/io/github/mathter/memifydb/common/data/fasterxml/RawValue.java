@@ -5,11 +5,9 @@ import io.github.mathter.memifydb.common.util.Opt;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)

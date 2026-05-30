@@ -23,13 +23,9 @@ import java.util.Map;
  * limitations under the License.
  */
 public class CommandSerializationFactoryProviderV1 implements CommandSerializationFactoryProvider {
-    public static final String ID = "simple";
-
-    public static final String PROPERTY_VALUE_FACTORY = "value-factory";
-
     @Override
     public String id() {
-        return ID;
+        return Const.ID;
     }
 
     @Override
@@ -41,7 +37,7 @@ public class CommandSerializationFactoryProviderV1 implements CommandSerializati
         final ValueFactory result;
         final Object idObject;
 
-        if (properties != null && (idObject = properties.get(PROPERTY_VALUE_FACTORY)) != null) {
+        if (properties != null && (idObject = properties.get(Const.PROPERTY_VALUE_FACTORY)) != null) {
             if (idObject instanceof String string) {
                 result = ValueFactory.get(string);
             } else if (idObject instanceof ValueFactory valueFactory) {

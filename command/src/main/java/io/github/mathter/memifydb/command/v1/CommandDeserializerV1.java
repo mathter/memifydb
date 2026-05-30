@@ -9,6 +9,8 @@ import io.github.mathter.memifydb.common.util.ByteArray;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,18 +36,21 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
     private final ValueDeserializer valueDeserializer;
 
     static {
-        map = Map.of(
-                new Key(XaStartTransactionCommand.getPrefix()), CommandDeserializerV1::readXaStartTransactionCommand,
-                new Key(XaEndTransactionCommand.getPrefix()), CommandDeserializerV1::readXaEndTransactionCommand,
-                new Key(XaPrepareTransactionCommand.getPrefix()), CommandDeserializerV1::readXaPrepareTransactionCommand,
-                new Key(XaCommitTransactionCommand.getPrefix()), CommandDeserializerV1::readXaCommitTransactionCommand,
-                new Key(XaRollbackTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRollbackTransactionCommand,
-                new Key(XaWrapperCommand.getPrefix()), CommandDeserializerV1::readXaWrapperCommand,
-                new Key(PutCommand.getPrefix()), CommandDeserializerV1::readPutCommand,
-                new Key(RemoveCommand.getPrefix()), CommandDeserializerV1::readRemoveCommand,
-                new Key(GetCommand.getPrefix()), CommandDeserializerV1::readGetCommand,
-                new Key(XaRecoverTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRecoverCommand
-        );
+        final Map<Key, Reader> tmp = new HashMap<>();
+        tmp.put(new Key(XaStartTransactionCommand.getPrefix()), CommandDeserializerV1::readXaStartTransactionCommand);
+        tmp.put(new Key(XaEndTransactionCommand.getPrefix()), CommandDeserializerV1::readXaEndTransactionCommand);
+        tmp.put(new Key(XaPrepareTransactionCommand.getPrefix()), CommandDeserializerV1::readXaPrepareTransactionCommand);
+        tmp.put(new Key(XaCommitTransactionCommand.getPrefix()), CommandDeserializerV1::readXaCommitTransactionCommand);
+        tmp.put(new Key(XaRollbackTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRollbackTransactionCommand);
+        tmp.put(new Key(XaWrapperCommand.getPrefix()), CommandDeserializerV1::readXaWrapperCommand);
+        tmp.put(new Key(PutCommand.getPrefix()), CommandDeserializerV1::readPutCommand);
+        tmp.put(new Key(RemoveCommand.getPrefix()), CommandDeserializerV1::readRemoveCommand);
+        tmp.put(new Key(GetCommand.getPrefix()), CommandDeserializerV1::readGetCommand);
+        tmp.put(new Key(XaRecoverTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRecoverCommand);
+        tmp.put(new Key(SelectUniverseCommand.getPrefix()), CommandDeserializerV1::readSelectUniverseCommand);
+        tmp.put(new Key(ByCommand.getPrefix()), CommandDeserializerV1::readByCommand);
+
+        map = Collections.unmodifiableMap(tmp);
     }
 
     public CommandDeserializerV1(ValueSerializer valueSerializer, ValueDeserializer valueDeserializer) {
@@ -71,6 +76,17 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
         }
 
         return result;
+    }
+
+    private ByCommand readByCommand(InputStream is) throws IOException {
+        return new ByCommand(IOUtil.readSequenceNumber(is));
+    }
+
+    private SelectUniverseCommand readSelectUniverseCommand(InputStream is) throws IOException {
+        return new SelectUniverseCommand(
+                IOUtil.readSequenceNumber(is),
+                this.valueDeserializer.deserialize(IOUtil.read(is)).get()
+        );
     }
 
     private XaStartTransactionCommand readXaStartTransactionCommand(InputStream is) throws IOException {

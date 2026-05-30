@@ -1,8 +1,5 @@
 package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.CommandDeserializer;
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.command.CommandSerializer;
 import io.github.mathter.memifydb.command.ResultDeserializer;
 import io.github.mathter.memifydb.command.ResultSerializationFactory;
 import io.github.mathter.memifydb.command.ResultSerializer;
@@ -27,7 +24,7 @@ import io.github.mathter.memifydb.common.data.ValueTranslator;
  * limitations under the License.
  */
 public class AbstractResultTest {
-    protected final ResultSerializationFactory factory = ResultSerializationFactory.get(ResultSerializationFactoryProviderV1.ID);
+    protected final ResultSerializationFactory factory = ResultSerializationFactory.get(Const.ID);
 
     protected final ResultSerializer serializer = this.factory.serializer();
 

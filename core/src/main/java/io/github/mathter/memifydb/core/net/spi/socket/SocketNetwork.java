@@ -1,5 +1,11 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
+import io.github.mathter.memifydb.command.CommandDeserializer;
+import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializer;
+import io.github.mathter.memifydb.command.ResultDeserializer;
+import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.ResultSerializer;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.universe.Universe;
 
@@ -9,7 +15,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +25,21 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Copyright 2026 Alexander Kashirsky (mathter)
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 class SocketNetwork implements Network {
     private static final Logger LOG = Logger.getLogger(SocketNetwork.class.getName());
 
@@ -39,25 +59,42 @@ class SocketNetwork implements Network {
 
     final AcceptSocketThread acceptSocketThread = new AcceptSocketThread();
 
+    final CommandSerializer commandSerializer;
+
+    final CommandDeserializer commandDeserializer;
+
+    final ResultSerializer resultSerializer;
+
+    final ResultDeserializer resultDeserializer;
+
     final Map<String, Universe> universes;
+
+    Universe universe;
 
     public SocketNetwork(
             InetAddress address,
             int port,
             int backlog,
             int maxConnectionCount,
+            CommandSerializationFactory commandSerializationFactory,
+            ResultSerializationFactory resultDeserializationFactory,
             Collection<Universe> universes
     ) {
         this.address = address;
         this.port = port;
         this.backlog = backlog;
         this.maxConnectionCount = maxConnectionCount;
+        this.commandSerializer = commandSerializationFactory.serializer();
+        this.commandDeserializer = commandSerializationFactory.deserializer();
+        this.resultSerializer = resultDeserializationFactory.serializer();
+        this.resultDeserializer = resultDeserializationFactory.deserializer();
         this.universes = Optional.ofNullable(universes)
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
                 .collect(Collectors.toMap(e -> e.getName(), Function.identity()));
 
         CLEANER.register(this, () -> {
+            LOG.info(String.format("Stop network connection serve!", this.address));
             try {
                 this.close();
             } catch (Exception e) {
@@ -83,7 +120,7 @@ class SocketNetwork implements Network {
         LOG.info(String.format("Stoping socket %s", this));
 
         this.acceptSocketThread.interrupt();
-        this.executor.shutdown();
+        this.executor.shutdownNow();
     }
 
     @Override

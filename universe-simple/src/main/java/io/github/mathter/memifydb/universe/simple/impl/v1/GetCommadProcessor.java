@@ -2,7 +2,6 @@ package io.github.mathter.memifydb.universe.simple.impl.v1;
 
 import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.v1.GetCommand;
-import io.github.mathter.memifydb.command.v1.RemoveCommand;
 import io.github.mathter.memifydb.command.v1.ValueResult;
 import io.github.mathter.memifydb.common.data.Value;
 import io.github.mathter.memifydb.common.util.Opt;

@@ -3,7 +3,6 @@ package io.github.mathter.memifydb.universe.simple.impl.v1;
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.v1.ExceptionResult;
-import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.command.v1.XaWrapperCommand;
 import io.github.mathter.memifydb.universe.Context;
 import io.github.mathter.memifydb.universe.simple.impl.CommandProcessor;

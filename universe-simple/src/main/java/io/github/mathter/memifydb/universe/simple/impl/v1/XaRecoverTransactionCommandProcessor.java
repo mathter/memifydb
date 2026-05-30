@@ -1,9 +1,7 @@
 package io.github.mathter.memifydb.universe.simple.impl.v1;
 
-import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.Result;
 import io.github.mathter.memifydb.command.v1.ValueResult;
-import io.github.mathter.memifydb.command.v1.VoidResult;
 import io.github.mathter.memifydb.command.v1.XaRecoverTransactionCommand;
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.universe.Context;
@@ -13,7 +11,6 @@ import javax.transaction.xa.Xid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 public class XaRecoverTransactionCommandProcessor implements CommandProcessor<XaRecoverTransactionCommand> {
     @Override

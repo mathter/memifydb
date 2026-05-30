@@ -1,7 +1,5 @@
 package io.github.mathter.memifydb.command;
 
-import org.apache.commons.lang3.RandomUtils;
-
 public class Test {
     static void main() {
         long l = 256;

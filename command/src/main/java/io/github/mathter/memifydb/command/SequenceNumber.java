@@ -1,7 +1,5 @@
 package io.github.mathter.memifydb.command;
 
-import io.github.mathter.memifydb.common.util.ByteArray;
-
 import java.io.Serial;
 
 /**

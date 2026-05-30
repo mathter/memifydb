@@ -1,12 +1,24 @@
 package io.github.mathter.memifydb.core.net.socket;
 
+import io.github.mathter.memifydb.command.Command;
+import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.Result;
+import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.SequenceNumber;
+import io.github.mathter.memifydb.command.v1.ByCommand;
+import io.github.mathter.memifydb.command.v1.SelectUniverseCommand;
+import io.github.mathter.memifydb.command.v1.ValueResult;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.core.net.NetworkFactory;
 import io.github.mathter.memifydb.universe.Universe;
 import io.github.mathter.memifydb.universe.UniverseFactory;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +42,8 @@ public class SocketNetworkCreationTest {
     @Test
     public void test() throws Exception {
         final NetworkFactory factory = NetworkFactory.getInstance(Const.ID);
+        final CommandSerializationFactory commandSerializationFactory = CommandSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
+        final ResultSerializationFactory resultSerializationFactory = ResultSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
         final Universe universe = UniverseFactory.getInstance(io.github.mathter.memifydb.universe.simple.Const.ID)
                 .newInstance(
                         Map.of(
@@ -48,9 +62,32 @@ public class SocketNetworkCreationTest {
         )) {
             network.start();
 
-            final Socket socket = new Socket("localhost", 1234);
+            try (final Socket socket = new Socket("localhost", 1234)) {
+                try (final OutputStream os = socket.getOutputStream()) {
+                    try (final InputStream is = socket.getInputStream()) {
+                        SequenceNumber sequenceNumber = new SequenceNumber(RandomUtils.nextInt());
+                        final SelectUniverseCommand selectUniverseCommand = new SelectUniverseCommand(
+                                sequenceNumber,
+                                universe.getName()
+                        );
 
-            socket.getInputStream().read();
+                        commandSerializationFactory.serializer().serialize(os, selectUniverseCommand);
+                        os.flush();
+                        Result result = resultSerializationFactory.deserializer().deserialize(is);
+                        Assertions.assertNotNull(result);
+                        Assertions.assertTrue(result instanceof ValueResult);
+                        Assertions.assertEquals(universe.getName(), ((ValueResult) result).getValue().get());
+
+                        sequenceNumber = sequenceNumber.next();
+                        final ByCommand byCommand = new ByCommand(sequenceNumber);
+                        commandSerializationFactory.serializer().serialize(os, byCommand);
+                        Command command = commandSerializationFactory.deserializer().deserialize(is);
+                        Assertions.assertNotNull(command);
+                        Assertions.assertEquals(ByCommand.class, command.getClass());
+                        Assertions.assertEquals(sequenceNumber, command.getSequenceNumber());
+                    }
+                }
+            }
         }
     }
 }

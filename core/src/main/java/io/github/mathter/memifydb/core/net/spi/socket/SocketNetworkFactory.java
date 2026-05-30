@@ -1,5 +1,7 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
+import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.ResultSerializationFactory;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.core.net.NetworkFactory;
 import io.github.mathter.memifydb.core.net.socket.Const;
@@ -34,6 +36,8 @@ class SocketNetworkFactory extends NetworkFactory {
                 buidPort(properties),
                 buidBacklog(properties),
                 buidMaxConnectionCount(properties),
+                buildCommandSerelizationFactory(properties),
+                buildResultSerializationFactory(properties),
                 buildUniverses(properties)
         );
     }
@@ -141,7 +145,7 @@ class SocketNetworkFactory extends NetworkFactory {
                 result = new ArrayList<>();
 
                 for (Object element : collection) {
-                    if (object instanceof Universe universe) {
+                    if (element instanceof Universe universe) {
                         result.add(universe);
                     }
                 }
@@ -150,6 +154,54 @@ class SocketNetworkFactory extends NetworkFactory {
             }
         } else {
             throw new IllegalArgumentException(String.format("The property '%s' is required", Const.PROPERTY_UNIVERSES));
+        }
+
+        return result;
+    }
+
+    private CommandSerializationFactory buildCommandSerelizationFactory(Map<?, ?> properties) {
+        final CommandSerializationFactory result;
+        final Object object;
+
+        if ((object = properties.get(Const.PROPERTY_COMMAND_SERIALIZATION_FACTORY)) != null) {
+            if (object instanceof CommandSerializationFactory factory) {
+                result = factory;
+            } else if (object instanceof String string) {
+                result = CommandSerializationFactory.get(string);
+            } else {
+                throw new IllegalArgumentException(
+                        String.format(
+                                "The property '%s'=%s is incorrect!",
+                                Const.PROPERTY_COMMAND_SERIALIZATION_FACTORY, object
+                        )
+                );
+            }
+        } else {
+            result = CommandSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
+        }
+
+        return result;
+    }
+
+    private ResultSerializationFactory buildResultSerializationFactory(Map<?, ?> properties) {
+        final ResultSerializationFactory result;
+        final Object object;
+
+        if ((object = properties.get(Const.PROPERTY_RESULT_SERIALIZATION_FACTORY)) != null) {
+            if (object instanceof ResultSerializationFactory factory) {
+                result = factory;
+            } else if (object instanceof String string) {
+                result = ResultSerializationFactory.get(string);
+            } else {
+                throw new IllegalArgumentException(
+                        String.format(
+                                "The property '%s'=%s is incorrect!",
+                                Const.PROPERTY_RESULT_SERIALIZATION_FACTORY, object
+                        )
+                );
+            }
+        } else {
+            result = ResultSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
         }
 
         return result;

@@ -6,4 +6,8 @@
     <suppress checks="MagicNumber" files="SimpleSpaceTest.java"/>
     <suppress checks="MagicNumber" files="FileLogFactoryTest.java"/>
     <suppress checks="MagicNumber" files="SerializationTest"/>
+    <suppress checks="MagicNumber" files="RemoveCommandTest"/>
+    <suppress checks="MagicNumber" files="TransactionTest"/>
+    <suppress checks="MagicNumber" files="PutCommandTest"/>
+    <suppress checks="MagicNumber" files="SocketNetworkCreationTest"/>
 </suppressions>

@@ -6,7 +6,6 @@ import io.github.mathter.memifydb.common.util.ByteArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)

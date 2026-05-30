@@ -1,6 +1,14 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
+import io.github.mathter.memifydb.command.Command;
+import io.github.mathter.memifydb.command.v1.ByCommand;
+import io.github.mathter.memifydb.command.v1.SelectUniverseCommand;
+import io.github.mathter.memifydb.command.v1.ValueResult;
+import io.github.mathter.memifydb.universe.Universe;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,21 +35,77 @@ class Task implements Runnable {
 
     private final Socket socket;
 
-    public Task(SocketNetwork socketNetwork, Socket socket) {
+    private final InputStream is;
+
+    private final OutputStream os;
+
+    public Task(SocketNetwork socketNetwork, Socket socket) throws IOException {
         this.socketNetwork = socketNetwork;
         this.socket = socket;
+        this.is = socket.getInputStream();
+        this.os = socket.getOutputStream();
     }
 
     @Override
     public void run() {
         try {
-            this.socket.close();
-            throw new UnsupportedOperationException("Not supported yet.");
+            while (!Thread.interrupted()) {
+                final Command command = this.socketNetwork.commandDeserializer.deserialize(this.is);
+
+                if (command != null) {
+                    this.processCommand(command);
+                } else {
+                    LOG.info(String.format("No command received for %s", this.socket.getRemoteSocketAddress()));
+                }
+            }
         } catch (IOException e) {
             LOG.log(Level.SEVERE, String.format("Socket error for %s!", this.socketNetwork), e);
         } finally {
             LOG.info(String.format("Closing %s", this.socket));
             this.socketNetwork.acceptSocketThread.connectionCount--;
+        }
+    }
+
+    private void processCommand(Command command) throws IOException {
+        switch (command) {
+            case SelectUniverseCommand cmd -> process(cmd);
+            case ByCommand cmd -> process(cmd);
+            default -> throw new IOException("Unknown command: " + command);
+        }
+    }
+
+    private void process(ByCommand command) throws IOException {
+        LOG.info(String.format("The remote host %s said goodbye", this.socket.getRemoteSocketAddress()));
+        this.socketNetwork.commandSerializer.serialize(os, command);
+        os.flush();
+        Thread.currentThread().interrupt();
+    }
+
+    private void process(SelectUniverseCommand command) {
+        try {
+            final Universe universe = this.socketNetwork.universes.get(command.getUniverseName());
+
+            if (universe != null) {
+                this.socketNetwork.universe = universe;
+                LOG.info(String.format("Set universe %s for socket %s", universe, this.socket));
+                this.socketNetwork.resultSerializer.serialize(
+                        this.os,
+                        new ValueResult(
+                                command.getSequenceNumber(),
+                                universe.getValueFactory().translator().from(command.getUniverseName())
+                        )
+                );
+            } else {
+
+            }
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE,
+                    String.format(
+                            "Error while processing command %s",
+                            this.socket.getRemoteSocketAddress()
+                    ),
+                    e
+            );
         }
     }
 }

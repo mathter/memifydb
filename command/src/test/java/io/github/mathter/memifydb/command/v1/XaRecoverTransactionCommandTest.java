@@ -1,7 +1,6 @@
 package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.SequenceNumber;
-import io.github.mathter.memifydb.common.xa.Xid;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

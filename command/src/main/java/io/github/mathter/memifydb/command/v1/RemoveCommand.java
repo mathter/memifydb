@@ -1,11 +1,8 @@
 package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.SequenceNumber;
 import io.github.mathter.memifydb.common.data.Value;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**

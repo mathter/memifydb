@@ -137,8 +137,8 @@ public class TransactionTest {
                 .getInstance(Const.ID)
                 .newInstance(
                         Map.of(
-                                Const.PROPERTY_NAME, RandomStringUtils.randomAlphabetic(10)
-                                , Const.PROPERTY_SPACES, List.of(space)
+                                Const.PROPERTY_NAME, RandomStringUtils.randomAlphabetic(10), Const.PROPERTY_SPACES,
+                                List.of(space)
                         )
                 );
         final Value key = universe.getValueFactory().translator().from(RandomStringUtils.randomAlphanumeric(16));

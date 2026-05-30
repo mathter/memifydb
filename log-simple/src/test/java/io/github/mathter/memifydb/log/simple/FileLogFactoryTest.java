@@ -2,7 +2,7 @@ package io.github.mathter.memifydb.log.simple;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.SequenceNumber;
-import io.github.mathter.memifydb.command.v1.CommandSerializationFactoryProviderV1;
+import io.github.mathter.memifydb.command.v1.Const;
 import io.github.mathter.memifydb.command.v1.PutCommand;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
@@ -88,7 +88,7 @@ public class FileLogFactoryTest {
                         FileLogFactory.Const.PARAM_LOG_ROOT_DIR, root,
                         FileLogFactory.Const.PARAM_FILE_MAX_SIZE, 100,
                         FileLogFactory.Const.PARAM_COMMAND_SERELIZATION_FACTORY,
-                        CommandSerializationFactoryProviderV1.ID
+                        Const.ID
                 )
         );
 

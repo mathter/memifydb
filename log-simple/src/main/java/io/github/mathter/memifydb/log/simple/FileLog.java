@@ -10,10 +10,8 @@ import io.github.mathter.memifydb.log.Package;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;

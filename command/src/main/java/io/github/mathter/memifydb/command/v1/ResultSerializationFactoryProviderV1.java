@@ -8,13 +8,11 @@ import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
 import java.util.Map;
 
 public class ResultSerializationFactoryProviderV1 implements ResultSerializationFactoryProvider {
-    public static final String ID = "simple";
-
     public static final String PROPERTY_VALUE_FACTORY = "value-factory";
 
     @Override
     public String id() {
-        return ID;
+        return Const.ID;
     }
 
     @Override

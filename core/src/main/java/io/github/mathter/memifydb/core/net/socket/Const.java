@@ -26,5 +26,9 @@ public class Const {
 
     public static final String PROPERTY_MAXCONNECTIONCOUNT = "maxConnectionCount";
 
+    public static final String PROPERTY_COMMAND_SERIALIZATION_FACTORY = "command-serialization-factory";
+
+    public static final String PROPERTY_RESULT_SERIALIZATION_FACTORY = "result-serialization-factory";
+
     public static final String PROPERTY_UNIVERSES = "universes";
 }

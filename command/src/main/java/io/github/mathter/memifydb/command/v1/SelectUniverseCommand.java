@@ -1,7 +1,6 @@
-package io.github.mathter.memifydb.command;
+package io.github.mathter.memifydb.command.v1;
 
-import java.io.IOException;
-import java.io.InputStream;
+import io.github.mathter.memifydb.command.SequenceNumber;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -18,6 +17,21 @@ import java.io.InputStream;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface ResultDeserializer {
-    public <R extends Result> R deserialize(InputStream is) throws IOException;
+public class SelectUniverseCommand extends AbstractCommand {
+    private static final byte[] PREFIX = {0x02, 0x01};
+
+    private final String universeName;
+
+    public SelectUniverseCommand(SequenceNumber sequenceNumber, String universeName) {
+        super(sequenceNumber);
+        this.universeName = universeName;
+    }
+
+    public static byte[] getPrefix() {
+        return PREFIX;
+    }
+
+    public String getUniverseName() {
+        return universeName;
+    }
 }
