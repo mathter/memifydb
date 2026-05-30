@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.common.data.ValueDeserializer;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 import io.github.mathter.memifydb.common.data.ValueSerializer;
@@ -20,16 +20,14 @@ import io.github.mathter.memifydb.common.data.ValueSerializer;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class CommandSerializationFactoryV1 extends CommandSerializationFactory {
-    public static final String ID = "simple";
-
+class CommandSerializationProviderV1 extends CommandSerializationProvider {
     private final ValueFactory valueFactory;
 
     private final ValueSerializer valueSerializer;
 
     private final ValueDeserializer valueDeserializer;
 
-    public CommandSerializationFactoryV1(ValueFactory valueFactory) {
+    public CommandSerializationProviderV1(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
         this.valueSerializer = valueFactory.serializer();
         this.valueDeserializer = valueFactory.deserializer();
@@ -37,7 +35,7 @@ class CommandSerializationFactoryV1 extends CommandSerializationFactory {
 
     @Override
     public String id() {
-        return ID;
+        return Const.ID;
     }
 
     @Override

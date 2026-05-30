@@ -1,5 +1,8 @@
-package io.github.mathter.memifydb.command.v1;
+package io.github.mathter.memifydb.command.spi;
 
+import io.github.mathter.memifydb.command.ResultSerializationProvider;
+
+import java.util.Map;
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -15,8 +18,8 @@ package io.github.mathter.memifydb.command.v1;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public interface Const {
-    public static final String ID = "simple";
+public interface ResultSerializationProviderFactory {
+    public String id();
 
-    public static final String PROPERTY_VALUE_FACTORY = "value-factory";
+    public ResultSerializationProvider provide(Map<?, ?> properties);
 }

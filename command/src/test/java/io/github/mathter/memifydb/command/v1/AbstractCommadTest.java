@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.CommandDeserializer;
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.command.CommandSerializer;
 import io.github.mathter.memifydb.common.data.ValueDeserializer;
 import io.github.mathter.memifydb.common.data.ValueFactory;
@@ -24,7 +24,7 @@ import io.github.mathter.memifydb.common.data.ValueTranslator;
  * limitations under the License.
  */
 public class AbstractCommadTest {
-    protected final CommandSerializationFactory factory = CommandSerializationFactory.get(CommandSerializationFactoryV1.ID);
+    protected final CommandSerializationProvider factory = CommandSerializationProvider.get(Const.ID);
 
     protected final CommandSerializer serializer = this.factory.serializer();
 

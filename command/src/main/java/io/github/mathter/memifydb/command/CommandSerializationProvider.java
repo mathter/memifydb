@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command;
 
-import io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
+import io.github.mathter.memifydb.command.spi.CommandSerializationProviderFactory;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 
 import java.util.Map;
@@ -21,22 +21,22 @@ import java.util.ServiceLoader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public abstract class CommandSerializationFactory {
-    public static final CommandSerializationFactory get(String id) {
+public abstract class CommandSerializationProvider {
+    public static final CommandSerializationProvider get(String id) {
         return get(id, null);
     }
 
-    public static final CommandSerializationFactory get(String id, Map<?, ?> properties) {
-        final ServiceLoader<CommandSerializationFactoryProvider> serviceLoader = ServiceLoader.load(CommandSerializationFactoryProvider.class);
+    public static final CommandSerializationProvider get(String id, Map<?, ?> properties) {
+        final ServiceLoader<CommandSerializationProviderFactory> serviceLoader = ServiceLoader.load(CommandSerializationProviderFactory.class);
 
-        for (CommandSerializationFactoryProvider provider : serviceLoader) {
+        for (CommandSerializationProviderFactory provider : serviceLoader) {
             if (id.equals(provider.id())) {
                 return provider.provide(properties);
             }
         }
 
         throw new IllegalStateException(
-                String.format("There is no %s with id='%s'", CommandSerializationFactory.class, id)
+                String.format("There is no %s with id='%s'", CommandSerializationProvider.class, id)
         );
     }
 

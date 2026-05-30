@@ -1,10 +1,10 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
 import io.github.mathter.memifydb.command.CommandDeserializer;
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.command.CommandSerializer;
 import io.github.mathter.memifydb.command.ResultDeserializer;
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.ResultSerializationProvider;
 import io.github.mathter.memifydb.command.ResultSerializer;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.universe.Universe;
@@ -76,16 +76,16 @@ class SocketNetwork implements Network {
             int port,
             int backlog,
             int maxConnectionCount,
-            CommandSerializationFactory commandSerializationFactory,
-            ResultSerializationFactory resultDeserializationFactory,
+            CommandSerializationProvider commandSerializationProvider,
+            ResultSerializationProvider resultDeserializationFactory,
             Collection<Universe> universes
     ) {
         this.address = address;
         this.port = port;
         this.backlog = backlog;
         this.maxConnectionCount = maxConnectionCount;
-        this.commandSerializer = commandSerializationFactory.serializer();
-        this.commandDeserializer = commandSerializationFactory.deserializer();
+        this.commandSerializer = commandSerializationProvider.serializer();
+        this.commandDeserializer = commandSerializationProvider.deserializer();
         this.resultSerializer = resultDeserializationFactory.serializer();
         this.resultDeserializer = resultDeserializationFactory.deserializer();
         this.universes = Optional.ofNullable(universes)

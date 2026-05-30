@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
+import io.github.mathter.memifydb.command.ResultSerializationProvider;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.core.net.NetworkFactory;
 import io.github.mathter.memifydb.core.net.socket.Const;
@@ -159,15 +159,15 @@ class SocketNetworkFactory extends NetworkFactory {
         return result;
     }
 
-    private CommandSerializationFactory buildCommandSerelizationFactory(Map<?, ?> properties) {
-        final CommandSerializationFactory result;
+    private CommandSerializationProvider buildCommandSerelizationFactory(Map<?, ?> properties) {
+        final CommandSerializationProvider result;
         final Object object;
 
         if ((object = properties.get(Const.PROPERTY_COMMAND_SERIALIZATION_FACTORY)) != null) {
-            if (object instanceof CommandSerializationFactory factory) {
+            if (object instanceof CommandSerializationProvider factory) {
                 result = factory;
             } else if (object instanceof String string) {
-                result = CommandSerializationFactory.get(string);
+                result = CommandSerializationProvider.get(string);
             } else {
                 throw new IllegalArgumentException(
                         String.format(
@@ -177,21 +177,21 @@ class SocketNetworkFactory extends NetworkFactory {
                 );
             }
         } else {
-            result = CommandSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
+            result = CommandSerializationProvider.get(io.github.mathter.memifydb.command.v1.Const.ID);
         }
 
         return result;
     }
 
-    private ResultSerializationFactory buildResultSerializationFactory(Map<?, ?> properties) {
-        final ResultSerializationFactory result;
+    private ResultSerializationProvider buildResultSerializationFactory(Map<?, ?> properties) {
+        final ResultSerializationProvider result;
         final Object object;
 
         if ((object = properties.get(Const.PROPERTY_RESULT_SERIALIZATION_FACTORY)) != null) {
-            if (object instanceof ResultSerializationFactory factory) {
+            if (object instanceof ResultSerializationProvider factory) {
                 result = factory;
             } else if (object instanceof String string) {
-                result = ResultSerializationFactory.get(string);
+                result = ResultSerializationProvider.get(string);
             } else {
                 throw new IllegalArgumentException(
                         String.format(
@@ -201,7 +201,7 @@ class SocketNetworkFactory extends NetworkFactory {
                 );
             }
         } else {
-            result = ResultSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
+            result = ResultSerializationProvider.get(io.github.mathter.memifydb.command.v1.Const.ID);
         }
 
         return result;

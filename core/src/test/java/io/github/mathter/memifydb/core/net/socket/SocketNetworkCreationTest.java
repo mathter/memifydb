@@ -1,9 +1,9 @@
 package io.github.mathter.memifydb.core.net.socket;
 
 import io.github.mathter.memifydb.command.Command;
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.command.Result;
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.ResultSerializationProvider;
 import io.github.mathter.memifydb.command.SequenceNumber;
 import io.github.mathter.memifydb.command.v1.ByCommand;
 import io.github.mathter.memifydb.command.v1.SelectUniverseCommand;
@@ -42,8 +42,8 @@ public class SocketNetworkCreationTest {
     @Test
     public void test() throws Exception {
         final NetworkFactory factory = NetworkFactory.getInstance(Const.ID);
-        final CommandSerializationFactory commandSerializationFactory = CommandSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
-        final ResultSerializationFactory resultSerializationFactory = ResultSerializationFactory.get(io.github.mathter.memifydb.command.v1.Const.ID);
+        final CommandSerializationProvider commandSerializationProvider = CommandSerializationProvider.get(io.github.mathter.memifydb.command.v1.Const.ID);
+        final ResultSerializationProvider resultSerializationProvider = ResultSerializationProvider.get(io.github.mathter.memifydb.command.v1.Const.ID);
         final Universe universe = UniverseFactory.getInstance(io.github.mathter.memifydb.universe.simple.Const.ID)
                 .newInstance(
                         Map.of(
@@ -71,17 +71,17 @@ public class SocketNetworkCreationTest {
                                 universe.getName()
                         );
 
-                        commandSerializationFactory.serializer().serialize(os, selectUniverseCommand);
+                        commandSerializationProvider.serializer().serialize(os, selectUniverseCommand);
                         os.flush();
-                        Result result = resultSerializationFactory.deserializer().deserialize(is);
+                        Result result = resultSerializationProvider.deserializer().deserialize(is);
                         Assertions.assertNotNull(result);
                         Assertions.assertTrue(result instanceof ValueResult);
                         Assertions.assertEquals(universe.getName(), ((ValueResult) result).getValue().get());
 
                         sequenceNumber = sequenceNumber.next();
                         final ByCommand byCommand = new ByCommand(sequenceNumber);
-                        commandSerializationFactory.serializer().serialize(os, byCommand);
-                        Command command = commandSerializationFactory.deserializer().deserialize(is);
+                        commandSerializationProvider.serializer().serialize(os, byCommand);
+                        Command command = commandSerializationProvider.deserializer().deserialize(is);
                         Assertions.assertNotNull(command);
                         Assertions.assertEquals(ByCommand.class, command.getClass());
                         Assertions.assertEquals(sequenceNumber, command.getSequenceNumber());

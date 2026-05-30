@@ -1,7 +1,7 @@
-import io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
-import io.github.mathter.memifydb.command.spi.ResultSerializationFactoryProvider;
-import io.github.mathter.memifydb.command.v1.CommandSerializationFactoryProviderV1;
-import io.github.mathter.memifydb.command.v1.ResultSerializationFactoryProviderV1;
+import io.github.mathter.memifydb.command.spi.CommandSerializationProviderFactory;
+import io.github.mathter.memifydb.command.spi.ResultSerializationProviderFactory;
+import io.github.mathter.memifydb.command.v1.CommandSerializationRoviderFactoryV1;
+import io.github.mathter.memifydb.command.v1.ResultSerializationProviderFactoryV1;
 
 module io.github.mathter.memifydb.command {
     requires java.transaction.xa;
@@ -13,8 +13,8 @@ module io.github.mathter.memifydb.command {
     exports io.github.mathter.memifydb.command.v1;
     exports io.github.mathter.memifydb.command.xa;
 
-    uses io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
-    uses io.github.mathter.memifydb.command.spi.ResultSerializationFactoryProvider;
-    provides CommandSerializationFactoryProvider with CommandSerializationFactoryProviderV1;
-    provides ResultSerializationFactoryProvider with ResultSerializationFactoryProviderV1;
+    uses CommandSerializationProviderFactory;
+    uses ResultSerializationProviderFactory;
+    provides CommandSerializationProviderFactory with CommandSerializationRoviderFactoryV1;
+    provides ResultSerializationProviderFactory with ResultSerializationProviderFactoryV1;
 }

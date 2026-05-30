@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command;
 
-import io.github.mathter.memifydb.command.spi.ResultSerializationFactoryProvider;
+import io.github.mathter.memifydb.command.spi.ResultSerializationProviderFactory;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 
 import java.util.Map;
@@ -21,19 +21,19 @@ import java.util.ServiceLoader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public abstract class ResultSerializationFactory {
-    public static ResultSerializationFactory get(String id) {
+public abstract class ResultSerializationProvider {
+    public static ResultSerializationProvider get(String id) {
         return get(id, null);
     }
 
-    public static ResultSerializationFactory get(String id, Map<?, ?> properties) {
+    public static ResultSerializationProvider get(String id, Map<?, ?> properties) {
         if (id == null) {
             throw new NullPointerException("id is null");
         }
 
-        final ServiceLoader<ResultSerializationFactoryProvider> loader = ServiceLoader.load(ResultSerializationFactoryProvider.class);
+        final ServiceLoader<ResultSerializationProviderFactory> loader = ServiceLoader.load(ResultSerializationProviderFactory.class);
 
-        for (ResultSerializationFactoryProvider provider : loader) {
+        for (ResultSerializationProviderFactory provider : loader) {
             if (id.equals(provider.id())) {
                 return provider.provide(properties);
             }
@@ -41,6 +41,8 @@ public abstract class ResultSerializationFactory {
 
         throw new IllegalArgumentException("No such result serialization factory with id " + id);
     }
+
+    public abstract String id();
 
     public abstract ResultSerializer serializer();
 

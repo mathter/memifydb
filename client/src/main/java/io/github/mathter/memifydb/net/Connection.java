@@ -1,8 +1,6 @@
-package io.github.mathter.memifydb.command.spi;
+package io.github.mathter.memifydb.net;
 
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
-
-import java.util.Map;
+import java.net.Socket;
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -18,9 +16,17 @@ import java.util.Map;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * <p>
+ * This interface represents command.
  */
-public interface CommandSerializationFactoryProvider {
-    public String id();
+public abstract class Connection {
+    private final Socket socket;
 
-    public CommandSerializationFactory provide(Map<?, ?> properties);
+    protected Connection(Socket socket) {
+        this.socket = socket;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
 }

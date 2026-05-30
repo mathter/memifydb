@@ -2,7 +2,7 @@ package io.github.mathter.memifydb.log.simple;
 
 import io.github.mathter.memifydb.command.Command;
 import io.github.mathter.memifydb.command.CommandDeserializer;
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.command.CommandSerializer;
 import io.github.mathter.memifydb.common.util.ByteArray;
 import io.github.mathter.memifydb.log.Log;
@@ -70,14 +70,14 @@ class FileLog implements Log {
 
     private final Cleaner.Cleanable cleanable;
 
-    public FileLog(CommandSerializationFactory commandSerializationFactory,
+    public FileLog(CommandSerializationProvider commandSerializationProvider,
                    Path root,
                    String fileNamePrefix,
                    String fileNamePostfix,
                    int fileMaxSize) {
         this.root = root;
-        this.serializer = commandSerializationFactory.serializer();
-        this.deserializer = commandSerializationFactory.deserializer();
+        this.serializer = commandSerializationProvider.serializer();
+        this.deserializer = commandSerializationProvider.deserializer();
         this.pattern = Pattern.compile(
                 String.format("^(%s)\\d+(%s)$", fileNamePrefix, fileNamePostfix)
         );

@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.command.v1;
 
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
-import io.github.mathter.memifydb.command.spi.CommandSerializationFactoryProvider;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
+import io.github.mathter.memifydb.command.spi.CommandSerializationProviderFactory;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 import io.github.mathter.memifydb.common.data.fasterxml.FasterXmlValueFactory;
 
@@ -22,15 +22,15 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class CommandSerializationFactoryProviderV1 implements CommandSerializationFactoryProvider {
+public class CommandSerializationRoviderFactoryV1 implements CommandSerializationProviderFactory {
     @Override
     public String id() {
         return Const.ID;
     }
 
     @Override
-    public CommandSerializationFactory provide(Map<?, ?> properties) {
-        return new CommandSerializationFactoryV1(buildValueFactory(properties));
+    public CommandSerializationProvider provide(Map<?, ?> properties) {
+        return new CommandSerializationProviderV1(buildValueFactory(properties));
     }
 
     private static ValueFactory buildValueFactory(Map<?, ?> properties) {

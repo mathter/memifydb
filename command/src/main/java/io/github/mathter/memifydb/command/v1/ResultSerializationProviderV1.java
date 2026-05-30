@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.ResultDeserializer;
-import io.github.mathter.memifydb.command.ResultSerializationFactory;
+import io.github.mathter.memifydb.command.ResultSerializationProvider;
 import io.github.mathter.memifydb.command.ResultSerializer;
 import io.github.mathter.memifydb.common.data.ValueFactory;
 
@@ -20,16 +20,21 @@ import io.github.mathter.memifydb.common.data.ValueFactory;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class ResultSerializationFactoryV1 extends ResultSerializationFactory {
+class ResultSerializationProviderV1 extends ResultSerializationProvider {
     private final ValueFactory valueFactory;
 
-    public ResultSerializationFactoryV1(ValueFactory valueFactory) {
+    public ResultSerializationProviderV1(ValueFactory valueFactory) {
         this.valueFactory = valueFactory;
     }
 
     @Override
     public ResultSerializer serializer() {
         return new ResultSerializerV1();
+    }
+
+    @Override
+    public String id() {
+        return Const.ID;
     }
 
     @Override

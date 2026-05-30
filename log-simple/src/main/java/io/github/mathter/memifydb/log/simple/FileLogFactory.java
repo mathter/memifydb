@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.log.simple;
 
-import io.github.mathter.memifydb.command.CommandSerializationFactory;
+import io.github.mathter.memifydb.command.CommandSerializationProvider;
 import io.github.mathter.memifydb.log.Log;
 import io.github.mathter.memifydb.log.LogFactory;
 
@@ -42,15 +42,15 @@ public class FileLogFactory extends LogFactory {
         );
     }
 
-    private static CommandSerializationFactory buildSerializationFactory(Map<?, ?> properties) {
-        final CommandSerializationFactory result;
+    private static CommandSerializationProvider buildSerializationFactory(Map<?, ?> properties) {
+        final CommandSerializationProvider result;
         final Object property = properties.get(Const.PARAM_COMMAND_SERELIZATION_FACTORY);
 
         if (property != null) {
-            if (property instanceof CommandSerializationFactory factory) {
+            if (property instanceof CommandSerializationProvider factory) {
                 result = factory;
             } else if (property instanceof String id) {
-                result = CommandSerializationFactory.get(id);
+                result = CommandSerializationProvider.get(id);
             } else {
                 throw new IllegalStateException(
                         String.format("Illegal property '%s'", property)
