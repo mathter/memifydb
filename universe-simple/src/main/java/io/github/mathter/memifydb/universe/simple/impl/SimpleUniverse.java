@@ -22,6 +22,7 @@ import io.github.mathter.memifydb.space.Operations;
 import io.github.mathter.memifydb.space.Space;
 import io.github.mathter.memifydb.universe.Context;
 import io.github.mathter.memifydb.universe.Universe;
+import io.github.mathter.memifydb.universe.UniverseDesc;
 import io.github.mathter.memifydb.universe.simple.impl.v1.GetCommadProcessor;
 import io.github.mathter.memifydb.universe.simple.impl.v1.PutCommadProcessor;
 import io.github.mathter.memifydb.universe.simple.impl.v1.RemoveCommadProcessor;
@@ -149,6 +150,11 @@ class SimpleUniverse implements Universe {
     @Override
     public XAResource getXAResource() {
         return this.xaResource;
+    }
+
+    @Override
+    public UniverseDesc getUniverseDesc() {
+        return new UniverseDesc(this.name, this.valueFactory.id());
     }
 
     @Override

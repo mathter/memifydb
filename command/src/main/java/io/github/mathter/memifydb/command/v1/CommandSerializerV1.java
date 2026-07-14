@@ -36,6 +36,14 @@ class CommandSerializerV1 implements CommandSerializer {
         this.valueDeserializer = valueDeserializer;
     }
 
+    private boolean write(OutputStream os, InitCommand command) throws IOException {
+        os.write(InitCommand.getPrefix());
+        IOUtil.write(os, command.getSequenceNumber());
+        IOUtil.write(os, this.valueSerializer.serialize(command.getArgument()));
+
+        return true;
+    }
+
     private boolean write(OutputStream os, ByCommand command) throws IOException {
         os.write(ByCommand.getPrefix());
         IOUtil.write(os, command.getSequenceNumber());
@@ -178,6 +186,7 @@ class CommandSerializerV1 implements CommandSerializer {
             case GetCommand cmd -> write(os, cmd);
             case SelectUniverseCommand cmd -> write(os, cmd);
             case ByCommand cmd -> write(os, cmd);
+            case InitCommand cmd -> write(os, cmd);
             default -> false;
         };
     }

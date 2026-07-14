@@ -41,6 +41,8 @@ public abstract class ValueFactory {
         );
     }
 
+    public abstract String algorithm();
+
     /**
      * Method returns realization if of this factory.
      *

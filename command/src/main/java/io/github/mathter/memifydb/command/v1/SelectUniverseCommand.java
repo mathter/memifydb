@@ -18,7 +18,7 @@ import io.github.mathter.memifydb.command.SequenceNumber;
  * limitations under the License.
  */
 public class SelectUniverseCommand extends AbstractCommand {
-    private static final byte[] PREFIX = {0x02, 0x01};
+    private static final byte[] PREFIX = {0x02, 0x02};
 
     private final String universeName;
 

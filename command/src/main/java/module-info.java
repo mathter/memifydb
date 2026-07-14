@@ -1,6 +1,6 @@
 import io.github.mathter.memifydb.command.spi.CommandSerializationProviderFactory;
 import io.github.mathter.memifydb.command.spi.ResultSerializationProviderFactory;
-import io.github.mathter.memifydb.command.v1.CommandSerializationRoviderFactoryV1;
+import io.github.mathter.memifydb.command.v1.CommandSerializationPoviderFactoryV1;
 import io.github.mathter.memifydb.command.v1.ResultSerializationProviderFactoryV1;
 
 module io.github.mathter.memifydb.command {
@@ -15,6 +15,6 @@ module io.github.mathter.memifydb.command {
 
     uses CommandSerializationProviderFactory;
     uses ResultSerializationProviderFactory;
-    provides CommandSerializationProviderFactory with CommandSerializationRoviderFactoryV1;
+    provides CommandSerializationProviderFactory with CommandSerializationPoviderFactoryV1;
     provides ResultSerializationProviderFactory with ResultSerializationProviderFactoryV1;
 }

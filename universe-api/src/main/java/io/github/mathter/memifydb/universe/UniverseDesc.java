@@ -1,37 +1,45 @@
 package io.github.mathter.memifydb.universe;
 
+import java.util.Objects;
+
 public class UniverseDesc {
-    private final String universeName;
+    private String universeName;
 
-    private final String valueFactoryId;
+    private String valueFactoryId;
 
-    private final String commandSerilizationFactoryId;
+    public UniverseDesc() {
+    }
 
-    private final String resultSerilizationFactoryId;
-
-    public UniverseDesc(String universeName,
-                        String valueFactoryId,
-                        String commandSerilizationFactoryId,
-                        String resultSerilizationFactoryId) {
+    public UniverseDesc(String universeName, String valueFactoryId) {
         this.universeName = universeName;
         this.valueFactoryId = valueFactoryId;
-        this.commandSerilizationFactoryId = commandSerilizationFactoryId;
-        this.resultSerilizationFactoryId = resultSerilizationFactoryId;
+    }
+
+    public void setUniverseName(String universeName) {
+        this.universeName = universeName;
     }
 
     public String getUniverseName() {
         return universeName;
     }
 
+    public void setValueFactoryId(String valueFactoryId) {
+        this.valueFactoryId = valueFactoryId;
+    }
+
     public String getValueFactoryId() {
         return valueFactoryId;
     }
 
-    public String getCommandSerilizationFactoryId() {
-        return commandSerilizationFactoryId;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UniverseDesc that = (UniverseDesc) o;
+        return Objects.equals(universeName, that.universeName) && Objects.equals(valueFactoryId, that.valueFactoryId);
     }
 
-    public String getResultSerilizationFactoryId() {
-        return resultSerilizationFactoryId;
+    @Override
+    public int hashCode() {
+        return Objects.hash(universeName, valueFactoryId);
     }
 }

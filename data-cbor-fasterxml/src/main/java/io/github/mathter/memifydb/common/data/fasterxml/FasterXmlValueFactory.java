@@ -31,6 +31,11 @@ public class FasterXmlValueFactory extends ValueFactory {
     }
 
     @Override
+    public String algorithm() {
+        return "cbor";
+    }
+
+    @Override
     public ValueSerializer serializer() {
         return MAPPER;
     }

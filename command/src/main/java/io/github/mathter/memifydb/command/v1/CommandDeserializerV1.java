@@ -49,6 +49,7 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
         tmp.put(new Key(XaRecoverTransactionCommand.getPrefix()), CommandDeserializerV1::readXaRecoverCommand);
         tmp.put(new Key(SelectUniverseCommand.getPrefix()), CommandDeserializerV1::readSelectUniverseCommand);
         tmp.put(new Key(ByCommand.getPrefix()), CommandDeserializerV1::readByCommand);
+        tmp.put(new Key(InitCommand.getPrefix()), CommandDeserializerV1::readInitCommand);
 
         map = Collections.unmodifiableMap(tmp);
     }
@@ -76,6 +77,13 @@ class CommandDeserializerV1 implements io.github.mathter.memifydb.command.Comman
         }
 
         return result;
+    }
+
+    private InitCommand readInitCommand(InputStream is) throws IOException {
+        return new InitCommand(
+                IOUtil.readSequenceNumber(is),
+                this.valueDeserializer.deserialize(IOUtil.read(is)).get(InitCommand.Info.class)
+        );
     }
 
     private ByCommand readByCommand(InputStream is) throws IOException {

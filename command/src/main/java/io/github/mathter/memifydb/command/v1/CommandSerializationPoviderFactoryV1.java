@@ -22,7 +22,7 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class CommandSerializationRoviderFactoryV1 implements CommandSerializationProviderFactory {
+public class CommandSerializationPoviderFactoryV1 implements CommandSerializationProviderFactory {
     @Override
     public String id() {
         return Const.ID;

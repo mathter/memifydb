@@ -2,6 +2,8 @@ package io.github.mathter.memifydb.command.v1;
 
 import io.github.mathter.memifydb.command.SequenceNumber;
 
+import java.util.UUID;
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -17,14 +19,26 @@ import io.github.mathter.memifydb.command.SequenceNumber;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ByCommand extends AbstractCommand {
-    private static final byte[] PREFIX = {0x02, 0x03};
+public class InitCommand extends OneArgCommand<InitCommand.Info> {
+    private static final byte[] PREFIX = {0x02, 0x01};
 
-    public ByCommand(SequenceNumber sequenceNumber) {
-        super(sequenceNumber);
+    public InitCommand(SequenceNumber sequenceNumber, Info argument) {
+        super(sequenceNumber, argument);
     }
 
     public static byte[] getPrefix() {
         return PREFIX;
+    }
+
+    public static class Info {
+        private UUID clientId;
+
+        public UUID getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(UUID clientId) {
+            this.clientId = clientId;
+        }
     }
 }

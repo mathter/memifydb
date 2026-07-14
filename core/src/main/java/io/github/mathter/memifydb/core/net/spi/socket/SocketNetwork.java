@@ -1,11 +1,7 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
-import io.github.mathter.memifydb.command.CommandDeserializer;
 import io.github.mathter.memifydb.command.CommandSerializationProvider;
-import io.github.mathter.memifydb.command.CommandSerializer;
-import io.github.mathter.memifydb.command.ResultDeserializer;
 import io.github.mathter.memifydb.command.ResultSerializationProvider;
-import io.github.mathter.memifydb.command.ResultSerializer;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.universe.Universe;
 
@@ -53,23 +49,21 @@ class SocketNetwork implements Network {
 
     private final int backlog;
 
-    final int maxConnectionCount;
+    private final int maxConnectionCount;
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    final AcceptSocketThread acceptSocketThread = new AcceptSocketThread();
+    private final AcceptSocketThread acceptSocketThread = new AcceptSocketThread();
 
-    final CommandSerializer commandSerializer;
+    private final CommandSerializationProvider serializationProvider;
 
-    final CommandDeserializer commandDeserializer;
+    private final ResultSerializationProvider resultSerializationProvider;
 
-    final ResultSerializer resultSerializer;
+    private final Map<String, Universe> universes;
 
-    final ResultDeserializer resultDeserializer;
+    private Universe universe;
 
-    final Map<String, Universe> universes;
-
-    Universe universe;
+    private int connectionCount = 0;
 
     public SocketNetwork(
             InetAddress address,
@@ -77,17 +71,15 @@ class SocketNetwork implements Network {
             int backlog,
             int maxConnectionCount,
             CommandSerializationProvider commandSerializationProvider,
-            ResultSerializationProvider resultDeserializationFactory,
+            ResultSerializationProvider resultSerializationProvider,
             Collection<Universe> universes
     ) {
         this.address = address;
         this.port = port;
         this.backlog = backlog;
         this.maxConnectionCount = maxConnectionCount;
-        this.commandSerializer = commandSerializationProvider.serializer();
-        this.commandDeserializer = commandSerializationProvider.deserializer();
-        this.resultSerializer = resultDeserializationFactory.serializer();
-        this.resultDeserializer = resultDeserializationFactory.deserializer();
+        this.serializationProvider = commandSerializationProvider;
+        this.resultSerializationProvider = resultSerializationProvider;
         this.universes = Optional.ofNullable(universes)
                 .map(Collection::stream)
                 .orElseGet(Stream::empty)
@@ -101,6 +93,10 @@ class SocketNetwork implements Network {
                 LOG.log(Level.SEVERE, String.format("Socket network %s closed", this), e);
             }
         });
+    }
+
+    public void releaseTask(Task task) {
+        this.connectionCount--;
     }
 
     @Override
@@ -134,9 +130,27 @@ class SocketNetwork implements Network {
         );
     }
 
-    public class AcceptSocketThread extends Thread {
-        public int connectionCount = 0;
+    public Map<String, Universe> getUniverses() {
+        return this.universes;
+    }
 
+    public void setUniverse(Universe universe) {
+        this.universe = universe;
+    }
+
+    public Universe getUniverse() {
+        return this.universe;
+    }
+
+    public CommandSerializationProvider getCommandSerializationProvider() {
+        return this.serializationProvider;
+    }
+
+    public ResultSerializationProvider getResultSerializationProvider() {
+        return this.resultSerializationProvider;
+    }
+
+    public class AcceptSocketThread extends Thread {
         @Override
         public void run() {
             LOG.info(String.format("Starting listening for %s", SocketNetwork.this));
@@ -146,14 +160,14 @@ class SocketNetwork implements Network {
                     final Socket socket = SocketNetwork.this.ss.accept();
                     LOG.info(String.format("Accepted socket connection from %s for %s", socket.getRemoteSocketAddress(), SocketNetwork.this));
 
-                    if (this.connectionCount >= SocketNetwork.this.maxConnectionCount) {
+                    if (SocketNetwork.this.connectionCount >= SocketNetwork.this.maxConnectionCount) {
                         LOG.info(String.format("Max connection count reached for %s!", SocketNetwork.this));
                         // TODO send information to the client about the maximum number of connections reached
                         socket.close();
                     }
 
                     SocketNetwork.this.executor.execute(new Task(SocketNetwork.this, socket));
-                    this.connectionCount++;
+                    SocketNetwork.this.connectionCount++;
                 } catch (Exception e) {
                     LOG.log(Level.SEVERE, "Error accepting socket!", e);
                 }

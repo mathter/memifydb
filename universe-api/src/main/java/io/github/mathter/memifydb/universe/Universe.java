@@ -42,4 +42,6 @@ public interface Universe {
     public ValueFactory getValueFactory();
 
     public XAResource getXAResource();
+
+    public UniverseDesc getUniverseDesc();
 }

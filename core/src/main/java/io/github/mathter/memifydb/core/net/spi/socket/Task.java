@@ -1,9 +1,14 @@
 package io.github.mathter.memifydb.core.net.spi.socket;
 
 import io.github.mathter.memifydb.command.Command;
+import io.github.mathter.memifydb.command.CommandDeserializer;
+import io.github.mathter.memifydb.command.CommandSerializer;
+import io.github.mathter.memifydb.command.ResultSerializer;
 import io.github.mathter.memifydb.command.v1.ByCommand;
+import io.github.mathter.memifydb.command.v1.InitCommand;
 import io.github.mathter.memifydb.command.v1.SelectUniverseCommand;
 import io.github.mathter.memifydb.command.v1.ValueResult;
+import io.github.mathter.memifydb.common.data.ValueSerializer;
 import io.github.mathter.memifydb.universe.Universe;
 
 import java.io.IOException;
@@ -33,6 +38,12 @@ class Task implements Runnable {
 
     private final SocketNetwork socketNetwork;
 
+    private final CommandSerializer commandSerializer;
+
+    private final CommandDeserializer commandDeserializer;
+
+    private final ResultSerializer resultSerializer;
+
     private final Socket socket;
 
     private final InputStream is;
@@ -41,6 +52,9 @@ class Task implements Runnable {
 
     public Task(SocketNetwork socketNetwork, Socket socket) throws IOException {
         this.socketNetwork = socketNetwork;
+        this.commandSerializer = this.socketNetwork.getCommandSerializationProvider().serializer();
+        this.commandDeserializer = this.socketNetwork.getCommandSerializationProvider().deserializer();
+        this.resultSerializer = this.socketNetwork.getResultSerializationProvider().serializer();
         this.socket = socket;
         this.is = socket.getInputStream();
         this.os = socket.getOutputStream();
@@ -50,7 +64,7 @@ class Task implements Runnable {
     public void run() {
         try {
             while (!Thread.interrupted()) {
-                final Command command = this.socketNetwork.commandDeserializer.deserialize(this.is);
+                final Command command = this.commandDeserializer.deserialize(this.is);
 
                 if (command != null) {
                     this.processCommand(command);
@@ -62,37 +76,49 @@ class Task implements Runnable {
             LOG.log(Level.SEVERE, String.format("Socket error for %s!", this.socketNetwork), e);
         } finally {
             LOG.info(String.format("Closing %s", this.socket));
-            this.socketNetwork.acceptSocketThread.connectionCount--;
+            this.socketNetwork.releaseTask(Task.this);
         }
     }
 
     private void processCommand(Command command) throws IOException {
         switch (command) {
+            case InitCommand cmd -> process(cmd);
             case SelectUniverseCommand cmd -> process(cmd);
             case ByCommand cmd -> process(cmd);
-            default -> this.socketNetwork.universe.process(command);
+            default -> this.socketNetwork.getUniverse().process(command);
         }
+    }
+
+    private void process(InitCommand command) throws IOException {
+        LOG.info(
+                String.format(
+                        "Initializing client %s of remote host %s",
+                        command.getArgument().getClientId(),
+                        this.socketNetwork.getUniverse()
+                )
+        );
+        throw new UnsupportedOperationException();
     }
 
     private void process(ByCommand command) throws IOException {
         LOG.info(String.format("The remote host %s said goodbye", this.socket.getRemoteSocketAddress()));
-        this.socketNetwork.commandSerializer.serialize(os, command);
+        this.commandSerializer.serialize(os, command);
         os.flush();
         Thread.currentThread().interrupt();
     }
 
     private void process(SelectUniverseCommand command) {
         try {
-            final Universe universe = this.socketNetwork.universes.get(command.getUniverseName());
+            final Universe universe = this.socketNetwork.getUniverses().get(command.getUniverseName());
 
             if (universe != null) {
-                this.socketNetwork.universe = universe;
+                this.socketNetwork.setUniverse(universe);
                 LOG.info(String.format("Set universe %s for socket %s", universe, this.socket));
-                this.socketNetwork.resultSerializer.serialize(
+                this.resultSerializer.serialize(
                         this.os,
                         new ValueResult(
                                 command.getSequenceNumber(),
-                                universe.getValueFactory().translator().from(command.getUniverseName())
+                                universe.getValueFactory().translator().from(universe.getUniverseDesc())
                         )
                 );
             } else {

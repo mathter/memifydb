@@ -11,6 +11,7 @@ import io.github.mathter.memifydb.command.v1.ValueResult;
 import io.github.mathter.memifydb.core.net.Network;
 import io.github.mathter.memifydb.core.net.NetworkFactory;
 import io.github.mathter.memifydb.universe.Universe;
+import io.github.mathter.memifydb.universe.UniverseDesc;
 import io.github.mathter.memifydb.universe.UniverseFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -76,7 +77,8 @@ public class SocketNetworkCreationTest {
                         Result result = resultSerializationProvider.deserializer().deserialize(is);
                         Assertions.assertNotNull(result);
                         Assertions.assertTrue(result instanceof ValueResult);
-                        Assertions.assertEquals(universe.getName(), ((ValueResult) result).getValue().get());
+                        final UniverseDesc universeDesc = ((ValueResult) result).getValue().get(UniverseDesc.class);
+                        Assertions.assertEquals(universe.getUniverseDesc(), universeDesc);
 
                         sequenceNumber = sequenceNumber.next();
                         final ByCommand byCommand = new ByCommand(sequenceNumber);

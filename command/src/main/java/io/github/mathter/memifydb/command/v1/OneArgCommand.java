@@ -17,14 +17,15 @@ import io.github.mathter.memifydb.command.SequenceNumber;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class ByCommand extends AbstractCommand {
-    private static final byte[] PREFIX = {0x02, 0x03};
+public abstract class OneArgCommand<T> extends AbstractCommand {
+    private final T argument;
 
-    public ByCommand(SequenceNumber sequenceNumber) {
+    protected OneArgCommand(SequenceNumber sequenceNumber, T argument) {
         super(sequenceNumber);
+        this.argument = argument;
     }
 
-    public static byte[] getPrefix() {
-        return PREFIX;
+    public T getArgument() {
+        return argument;
     }
 }
