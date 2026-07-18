@@ -1,7 +1,8 @@
-package io.github.mathter.memifydb.data.cbor.fasterxml
+package io.github.mathter.memifydb.space.simple
 
-import io.github.mathter.memifydb.common.data.{Value, ValueSerelizationFactory}
+import io.github.mathter.memifydb.space.{KeyValueOperations, Space, SpaceFactory}
 import org.junit.jupiter.api.{Assertions, Test}
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -18,20 +19,13 @@ import org.junit.jupiter.api.{Assertions, Test}
  * limitations under the License.
  * <p>
  */
-class ValueSerializationFactoryTest {
+class SimpleSpaceFactoryTest {
   @Test
-  def test = {
-    val serializationFactory = ValueSerelizationFactory(FasterXmlValueSerializationFactory.id)
-    val serializer = serializationFactory.serializer
-    val deserializer = serializationFactory.deserializer
+  def testCreate(): Unit = {
+    val spaceFactory = SpaceFactory.apply(Const.id)
+    Assertions.assertNotNull(spaceFactory)
 
-    val v = serializer.serialize("This is same string")
-    Assertions.assertNotNull(v)
-    Assertions.assertNotNull(v.raw)
-
-    val r: Value[String] = deserializer.deserialize(v.raw)
-    Assertions.assertNotNull(r)
-    Assertions.assertEquals(r, v)
-    Assertions.assertEquals(v, r)
+    val space: Space[KeyValueOperations] = spaceFactory.instance("test")
+    Assertions.assertNotNull(space)
   }
 }

@@ -1,8 +1,7 @@
-package io.github.mathter.memifydb.common.data
+package io.github.mathter.memifydb.space
 
-import java.util.ServiceLoader
-import scala.jdk.CollectionConverters.given
-
+import java.util.{Properties, ServiceLoader}
+import scala.jdk.CollectionConverters.IterableHasAsScala
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -18,28 +17,21 @@ import scala.jdk.CollectionConverters.given
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * <p>
- * The class is factory of instances of the serilizer, deseralizer any type objects
- * to and from a byte array, as well as java objects
+ * SpaceFactory.
  */
-abstract class ValueSerelizationFactory {
-  /**
-   *
-   * @return
-   */
+trait SpaceFactory {
   def id: String
 
-  def serializer: ValueSerializer
+  def instance[O <: Operations, T <: Space[O]](name: String): T = this.instance(name, null)
 
-  def deserializer: ValueDeserializer
+  def instance[O <: Operations, T <: Space[O]](name: String, properties: Map[Any, Any]): T
 }
 
-object ValueSerelizationFactory {
-  def apply(id: String): ValueSerelizationFactory = {
-    val serviceLoader = ServiceLoader.load(classOf[ValueSerelizationFactory])
+object SpaceFactory {
+  def apply(id: String): SpaceFactory = {
+    val serviceLoader = ServiceLoader.load(classOf[SpaceFactory])
 
     serviceLoader.asScala.find(e => id == e.id)
-      .getOrElse(
-        throw new IllegalStateException(s"There is no ValueSerelizationFactory with id='${id}'!")
-      )
+      .getOrElse(throw new IllegalStateException(s"There is no SpaceFactory with id='${id}'!"))
   }
 }

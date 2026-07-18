@@ -1,9 +1,9 @@
-package io.github.mathter.memifydb.data.cbor.fasterxml
+package io.github.mathter.memifydb.space
 
-import io.github.mathter.memifydb.common.data.{Value, ValueDeserializer as apiValueDeserializer}
-import tools.jackson.databind.ObjectMapper
+import io.github.mathter.memifydb.transaction.xa.XaResourceProvider
 
-import scala.reflect.ClassTag
+import java.util.UUID
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -19,8 +19,16 @@ import scala.reflect.ClassTag
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * <p>
+ * Interface of the space. Its contains data stored in a database. It is like as table in a RDBMS.
  */
-private class ValueDeserializer(using val mapper: ObjectMapper) extends apiValueDeserializer {
-  override def deserialize[T](raw: Array[Byte])(using classTag: ClassTag[T]): Value[T] =
-    new RawValue[T](raw)
+trait Space[O <: Operations] {
+  def id: UUID
+
+  def name: String
+
+  def closed: Boolean
+
+  def operations: O
+
+  def XaResource: XaResourceProvider[O]
 }

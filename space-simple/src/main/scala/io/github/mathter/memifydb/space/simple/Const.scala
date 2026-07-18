@@ -1,9 +1,5 @@
-package io.github.mathter.memifydb.data.cbor.fasterxml
+package io.github.mathter.memifydb.space.simple
 
-import io.github.mathter.memifydb.common.data.{Value, ValueDeserializer as apiValueDeserializer}
-import tools.jackson.databind.ObjectMapper
-
-import scala.reflect.ClassTag
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -20,7 +16,12 @@ import scala.reflect.ClassTag
  * limitations under the License.
  * <p>
  */
-private class ValueDeserializer(using val mapper: ObjectMapper) extends apiValueDeserializer {
-  override def deserialize[T](raw: Array[Byte])(using classTag: ClassTag[T]): Value[T] =
-    new RawValue[T](raw)
+object Const {
+  val id: String = classOf[SimpleSpaceFactory].getName
+
+  val propertyId = "id"
+
+  val propertyTimeOut = "transaction-timeout"
+
+  val defaultTimeOut = 60
 }
