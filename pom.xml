@@ -11,22 +11,16 @@
     <packaging>pom</packaging>
     <modules>
         <module>common</module>
-        <module>data-cbor-fasterxml</module>
+        <module>data-fasterxml</module>
         <module>space-api</module>
-        <module>space-simple</module>
-        <module>log-api</module>
-        <module>log-simple</module>
         <module>transaction-api</module>
-        <module>universe-api</module>
-        <module>universe-simple</module>
-        <module>command</module>
-        <module>client</module>
-        <module>core</module>
+        <module>space-simple</module>
     </modules>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
+        <scala.version>3.8.1</scala.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -34,17 +28,12 @@
         <dependencies>
             <dependency>
                 <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>command</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.mathter.memifydb</groupId>
                 <artifactId>common</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>data-cbor-fasterxml</artifactId>
+                <artifactId>data-fasterxml</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -54,27 +43,7 @@
             </dependency>
             <dependency>
                 <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>universe-api</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.mathter.memifydb</groupId>
                 <artifactId>space-simple</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>universe-simple</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>log-api</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.mathter.memifydb</groupId>
-                <artifactId>log-simple</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
@@ -82,6 +51,13 @@
                 <artifactId>transaction-api</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala3-library_3</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -133,37 +109,18 @@
                     <version>3.15.0</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.6.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>13.3.0</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.checkerframework</groupId>
-                            <artifactId>checker-qual</artifactId>
-                            <version>3.54.0</version>
-                        </dependency>
-                    </dependencies>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>4.8.1</version>
                     <configuration>
-                        <configLocation>checkstyle/checkstyle.xml</configLocation>
-                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <propertiesLocation>checkstyle/checkstyle.properties</propertiesLocation>
-                        <consoleOutput>true</consoleOutput>
-                        <linkXRef>false</linkXRef>
-                        <sourceDirectories>
-                            <sourceDirectory>${project.build.sourceEncoding}</sourceDirectory>
-                        </sourceDirectories>
+                        <recompileMode>incremental</recompileMode>
+                        <scalaVersion>${scala.version}</scalaVersion>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>validate</id>
-                            <phase>validate</phase>
                             <goals>
-                                <goal>check</goal>
+                                <goal>compile</goal>
+                                <goal>testCompile</goal>
                             </goals>
                         </execution>
                     </executions>
