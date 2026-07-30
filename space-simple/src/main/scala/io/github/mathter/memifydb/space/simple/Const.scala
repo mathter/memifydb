@@ -21,7 +21,7 @@ object Const {
 
   val propertyId = "id"
 
-  val propertyTimeOut = "transaction-timeout"
+  val propertyTransactionTimeout = "transaction-timeout"
 
   val defaultTimeOut = 60
 }

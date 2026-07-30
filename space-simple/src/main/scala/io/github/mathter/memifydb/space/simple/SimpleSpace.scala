@@ -29,9 +29,17 @@ private class SimpleSpace(
   extends Space[KeyValueOperations] {
   private var isClosed = false
 
+  private val xaResource = new SimpleXaResource
+
   override def closed: Boolean = this.isClosed
 
-  override def operations: KeyValueOperations = ???
+  override def operations: KeyValueOperations =
+    new SimpleOperations
 
-  override def XaResource: XaResourceProvider[KeyValueOperations] = ???
+  override def XaResource: XaResourceProvider[KeyValueOperations] =
+    if (this.isClosed) {
+      throw new IllegalStateException(s"Error while closing Space id=${this.id}, name=${this.name}")
+    } else {
+      this.xaResource
+    }
 }
