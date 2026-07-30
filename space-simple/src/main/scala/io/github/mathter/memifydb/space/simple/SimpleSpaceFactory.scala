@@ -38,7 +38,7 @@ class SimpleSpaceFactory extends SpaceFactory {
           case x: UUID => x
           case x => throw new IllegalStateException(s"${x} not valid UUID")
         }
-        .get
+        .getOrElse(UUID.randomUUID())
     } else {
       UUID.randomUUID()
     }
@@ -46,14 +46,14 @@ class SimpleSpaceFactory extends SpaceFactory {
 
   private def buildTransactionTimeout(properties: Map[Any, Any]): Int = {
     if (properties != null) {
-      properties.get(Const.propertyTimeOut)
+      properties.get(Const.propertyTransactionTimeout)
         .map {
           case x: String => Integer.parseInt(x)
           case x: Int => x
           case x: Long => x.toInt
           case x => throw new IllegalStateException(s"${x} not valid integer for transaction timeout")
         }
-        .get
+        .getOrElse(Const.defaultTimeOut)
     } else {
       Const.defaultTimeOut
     }

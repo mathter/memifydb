@@ -1,7 +1,10 @@
 package io.github.mathter.memifydb.space.simple
 
 import io.github.mathter.memifydb.space.{KeyValueOperations, Space, SpaceFactory}
+import org.apache.commons.lang3.{RandomStringUtils, RandomUtils}
 import org.junit.jupiter.api.{Assertions, Test}
+
+import java.util.UUID
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -25,7 +28,44 @@ class SimpleSpaceFactoryTest {
     val spaceFactory = SpaceFactory.apply(Const.id)
     Assertions.assertNotNull(spaceFactory)
 
-    val space: Space[KeyValueOperations] = spaceFactory.instance("test")
+    val name = RandomStringUtils.insecure().nextAlphabetic(10)
+    val space: SimpleSpace = spaceFactory.instance(name)
     Assertions.assertNotNull(space)
+    Assertions.assertEquals(name, space.name)
+    Assertions.assertNotNull(space.id)
+    Assertions.assertEquals(Const.defaultTimeOut, space.transactionTimeout)
+  }
+
+  @Test
+  def testCreateWithId(): Unit = {
+    val spaceFactory = SpaceFactory.apply(Const.id)
+    Assertions.assertNotNull(spaceFactory)
+
+    val name = RandomStringUtils.insecure().nextAlphabetic(10)
+    val id = UUID.randomUUID()
+    val space: SimpleSpace = spaceFactory.instance(name, Map((Const.propertyId, id)))
+    Assertions.assertNotNull(space)
+    Assertions.assertEquals(name, space.name)
+    Assertions.assertEquals(id, space.id)
+    Assertions.assertEquals(Const.defaultTimeOut, space.transactionTimeout)
+  }
+
+  @Test
+  def testCreateWithIdAndTransactionTimeOut(): Unit = {
+    val spaceFactory = SpaceFactory.apply(Const.id)
+    Assertions.assertNotNull(spaceFactory)
+
+    val name = RandomStringUtils.insecure().nextAlphabetic(10)
+    val transactionTimeout = RandomUtils.insecure().randomInt()
+    val id = UUID.randomUUID()
+    val space: SimpleSpace =
+      spaceFactory.instance(name, Map(
+        (Const.propertyId, id),
+        (Const.propertyTransactionTimeout, transactionTimeout))
+      )
+    Assertions.assertNotNull(space)
+    Assertions.assertEquals(name, space.name)
+    Assertions.assertEquals(id, space.id)
+    Assertions.assertEquals(transactionTimeout, space.transactionTimeout)
   }
 }

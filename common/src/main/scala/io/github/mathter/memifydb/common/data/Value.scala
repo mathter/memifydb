@@ -28,10 +28,9 @@ trait Value[T] {
   override def hashCode(): Int = util.Arrays.hashCode(this.raw)
 
   override def equals(obj: Any): Boolean = {
-    if (obj.isInstanceOf[Value[T]]) {
-      util.Arrays.equals(this.raw, obj.asInstanceOf[Value[T]].raw)
-    } else {
-      false
+    obj match {
+      case value: Value[T] => util.Arrays.equals(this.raw, value.raw)
+      case _ => false
     }
   }
 }
