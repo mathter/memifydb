@@ -22,24 +22,24 @@ import java.util.UUID
  * <p>
  */
 private class SimpleSpace(
-                           val id: UUID,
-                           val name: String,
-                           val transactionTimeout: Int
+                           final val id: UUID,
+                           final val name: String,
+                           final val transactionTimeout: Int,
+                           final val ops: SimpleOperations = new SimpleOperations
                          )
   extends Space[KeyValueOperations] {
   private var isClosed = false
 
-  private val xaResource = new SimpleXaResource
+  private val xaRes = new SimpleXaResource(this, this.transactionTimeout)
 
   override def closed: Boolean = this.isClosed
 
-  override def operations: KeyValueOperations =
-    new SimpleOperations
+  override def operations: SimpleOperations = ops
 
-  override def XaResource: XaResourceProvider[KeyValueOperations] =
+  override def xaResource: XaResourceProvider[KeyValueOperations] =
     if (this.isClosed) {
       throw new IllegalStateException(s"Error while closing Space id=${this.id}, name=${this.name}")
     } else {
-      this.xaResource
+      this.xaRes
     }
 }

@@ -25,12 +25,12 @@ trait KeyValueOperations extends Operations {
   /**
    * Alias for [[KeyValueOperations.update()]]
    */
-  def put[V, R](key: Value[Any], value: Value[V]): Opt[Value[?]] = this.update(key, value)
+  def put[K, V, R](key: Value[K], value: Value[V]): Opt[Value[?]] = this.update(key, value)
 
   /**
    * Alias for [[KeyValueOperations.apply()]]
    */
-  def get[V](key: Value[Any]): Opt[Value[V]] = this.apply(key)
+  def get[K, V](key: Value[K]): Opt[Value[V]] = this.apply(key)
 
   /**
    * Method returns the value associated with the specified key.
@@ -38,7 +38,7 @@ trait KeyValueOperations extends Operations {
    * @param key key can't be null.
    * @return Opt wrapper of value.
    */
-  def apply[V](key: Value[Any]): Opt[Value[V]]
+  def apply[K, V](key: Value[K]): Opt[Value[V]]
 
   /**
    * Method puts value by key. Key can't be null.
@@ -48,7 +48,7 @@ trait KeyValueOperations extends Operations {
    * @return previous value specified by the key or [[Opt.empty]] otherwise.
    * @throws DifferentKeyTypeException if the key is of a different type from the keys in the storage.
    */
-  def update[V, R](key: Value[Any], value: Value[V]): Opt[Value[R]]
+  def update[K, V, R](key: Value[K], value: Value[V]): Opt[Value[R]]
 
   /**
    * Method removes value from space by the key.

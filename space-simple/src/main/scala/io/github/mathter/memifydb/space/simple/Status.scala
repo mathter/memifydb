@@ -1,8 +1,4 @@
-package io.github.mathter.memifydb.space
-
-import io.github.mathter.memifydb.transaction.xa.XaResourceProvider
-
-import java.util.UUID
+package io.github.mathter.memifydb.space.simple
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -19,16 +15,18 @@ import java.util.UUID
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * <p>
- * Interface of the space. Its contains data stored in a database. It is like as table in a RDBMS.
+ * Key-Value operations.
  */
-trait Space[O <: Operations] {
-  def id: UUID
+private enum Status {
+  case NEW
 
-  def name: String
+  case STARTED
 
-  def closed: Boolean
+  case ENDED
 
-  def operations: O
+  case PREPARED
 
-  def xaResource: XaResourceProvider[O]
+  case COMMITTING
+
+  case ROLLING_BACK
 }
