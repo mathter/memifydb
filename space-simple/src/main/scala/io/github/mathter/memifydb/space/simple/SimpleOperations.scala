@@ -14,7 +14,7 @@ private class SimpleOperations extends KeyValueOperations {
 
   private val writeLock: Lock = this.readWriteLock.writeLock()
 
-  private val map: mutable.Map[Value[Any], Opt[Value[? <: Any]]] = new mutable.HashMap()
+  private val map: mutable.Map[Value[? <: Any], Opt[Value[? <: Any]]] = new mutable.HashMap()
 
   /**
    * Method returns the value associated with the specified key.
@@ -22,7 +22,7 @@ private class SimpleOperations extends KeyValueOperations {
    * @param key key can't be null.
    * @return Opt wrapper of value.
    */
-  override def apply[V](key: Value[Any]): Opt[Value[V]] = {
+  override def apply[K, V](key: Value[K]): Opt[Value[V]] = {
     this.readLock.lock()
     try {
       this.map.getOrElse(key, Opt.empty).asInstanceOf[Opt[Value[V]]]
@@ -39,14 +39,19 @@ private class SimpleOperations extends KeyValueOperations {
    * @return previous value specified by the key or [[Opt.empty]] otherwise.
    * @throws DifferentKeyTypeException if the key is of a different type from the keys in the storage.
    */
-  override def update[V, R](key: Value[Any], value: Value[V]): Opt[Value[R]] = {
-    this.writeLock.lock()
+  override def update[K, V, R](key: Value[K], value: Value[V]): Opt[Value[R]] = {
+    if (key != null) {
+      this.writeLock.lock()
 
-    try {
-      val prev = this.map.put(key, Opt(value))
-      if (prev != null) prev.asInstanceOf[Opt[Value[R]]] else Opt.empty
-    } finally {
-      this.writeLock.unlock()
+      try {
+        this.map.put(key, Opt(value))
+          .getOrElse(Opt.empty)
+          .asInstanceOf[Opt[Value[R]]]
+      } finally {
+        this.writeLock.unlock()
+      }
+    } else {
+      throw new NullPointerException("key parameter can't be null!")
     }
   }
 
@@ -68,4 +73,46 @@ private class SimpleOperations extends KeyValueOperations {
   }
 
   override def clear(): Unit = this.map.clear()
+
+  def withMapWrite[T](fun: mutable.Map[Value[? <: Any], Opt[Value[? <: Any]]] => T): T = {
+    this.writeLock.lock()
+
+    try {
+      fun(this.map)
+    }
+    finally {
+      this.writeLock.unlock()
+    }
+  }
+
+  def withMapRead[T](fun: mutable.Map[Value[? <: Any], Opt[Value[? <: Any]]] => T): T = {
+    this.readLock.lock()
+
+    try {
+      fun(this.map)
+    }
+    finally {
+      this.readLock.unlock()
+    }
+  }
+
+  def getSafe(key: Value[? <: Any]): Opt[Value[? <: Any]] = {
+    this.readLock.lock()
+
+    try {
+      this.map.getOrElse(key, {
+        this.readLock.unlock()
+        this.writeLock.lock()
+
+        try {
+          this.map.getOrElse(key, null)
+        } finally {
+          this.readLock.lock()
+          this.writeLock.unlock()
+        }
+      })
+    } finally {
+      this.readLock.unlock()
+    }
+  }
 }

@@ -36,6 +36,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.github.mathter.memifydb</groupId>
+            <artifactId>data-fasterxml</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>6.0.3</version>
