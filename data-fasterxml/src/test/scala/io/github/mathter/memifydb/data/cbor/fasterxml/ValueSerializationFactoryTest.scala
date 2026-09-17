@@ -2,6 +2,7 @@ package io.github.mathter.memifydb.data.cbor.fasterxml
 
 import io.github.mathter.memifydb.common.data.{Value, ValueSerelizationFactory}
 import org.junit.jupiter.api.{Assertions, Test}
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -29,9 +30,10 @@ class ValueSerializationFactoryTest {
     Assertions.assertNotNull(v)
     Assertions.assertNotNull(v.raw)
 
-    val r: Value[String] = deserializer.deserialize(v.raw)
+    val r: Value[Object] = deserializer.deserialize(v.raw)
     Assertions.assertNotNull(r)
     Assertions.assertEquals(r, v)
     Assertions.assertEquals(v, r)
+    Assertions.assertEquals(v.get, r.get)
   }
 }
