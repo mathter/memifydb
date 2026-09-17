@@ -1,6 +1,8 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.{Command, CommandDesc, Prefix, Sequence}
+import io.github.mathter.memifydb.command.{CommandDesc, Prefix, Sequence}
+
+import javax.transaction.xa.Xid
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -18,17 +20,9 @@ import io.github.mathter.memifydb.command.{Command, CommandDesc, Prefix, Sequenc
  * limitations under the License.
  *
  */
-abstract class AbstractCommand(val sequence: Sequence) extends Command, CommandDesc {
-  private final val commandDesc = AbstractCommand.o(this.getClass)
-
-  override def prefix: Prefix = this.commandDesc.prefix
+class XaEndTransactionCommand(sequence: Sequence, xid: Xid, val flags: Int) extends AbstractXaCommand(sequence, xid) {
 }
 
-private object AbstractCommand {
-  def o[T](clazz: Class[T]): CommandDesc = {
-    Class.forName(clazz.getName + "$")
-      .getField("MODULE$")
-      .get(null)
-      .asInstanceOf[CommandDesc]
-  }
+object XaEndTransactionCommand extends CommandDesc {
+  val prefix: Prefix = PrefixV1(Array(0x10, 0x02))
 }
