@@ -42,4 +42,57 @@ case class Xid(val formatId: Int, val globalTransactionId: Array[Byte], val bran
       ""
     }
   }
+
+  override def hashCode(): Int = {
+    this.formatId + Xid.hashCode(this.globalTransactionId) + Xid.hashCode(this.branchQualifier)
+  }
+
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case x: JavaxXid => this.formatId == x.getFormatId
+        && Xid.equals(x.getGlobalTransactionId, this.branchQualifier)
+        && Xid.equals(x.getBranchQualifier, this.branchQualifier)
+      case _ => false
+    }
+  }
+}
+
+object Xid {
+  inline def hashCode(x: Array[Byte]): Int = {
+    var result = 0
+
+    if (x != null) {
+      x.foreach(result + _)
+    }
+
+    result
+  }
+
+  inline def equals(left: Array[Byte], right: Array[Byte]): Boolean = {
+    if (left eq right) {
+      true
+    } else {
+      if (left != null) {
+        if (right != null) {
+          if (left.length == right.length) {
+            for (i <- left.indices) {
+              left(i) == right(i)
+            }
+
+            true
+          } else {
+            false
+          }
+        } else {
+          false
+        }
+      } else {
+        if (right != null) {
+          false
+        } else {
+          true
+        }
+      }
+    }
+  }
 }

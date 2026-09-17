@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters.given
  * The class is factory of instances of the serilizer, deseralizer any type objects
  * to and from a byte array, as well as java objects
  */
-abstract class ValueSerelizationFactory {
+trait ValueSerelizationFactory {
   /**
    *
    * @return
