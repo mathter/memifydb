@@ -1,12 +1,12 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.{CommandSerizationFactoryProvider, Sequence}
-import org.apache.commons.lang3.{RandomStringUtils, RandomUtils}
+import io.github.mathter.memifydb.transaction.xa.Xid
+import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.{Assertions, Test}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.util.Using
-
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -23,24 +23,23 @@ import scala.util.Using
  * limitations under the License.
  *
  */
-class PutCommandTest {
+class XaEndTransactionCommandTest {
   val provider = CommandSerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
 
   @Test
   def test(): Unit = {
-    val spaceName = this.factory.valueSerelizationFactory.serializer
-      .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val key = this.factory.valueSerelizationFactory.serializer
-      .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val value = this.factory.valueSerelizationFactory.serializer
-      .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val cmd = new PutCommand(
+    val xid = Xid(
+      RandomUtils.insecure().randomInt(),
+      RandomUtils.insecure().randomBytes(10),
+      RandomUtils.insecure().randomBytes(10)
+    )
+    val flags = RandomUtils.insecure().randomInt()
+    val cmd = new XaEndTransactionCommand(
       Sequence(RandomUtils.insecure().randomLong()),
-      spaceName,
-      key,
-      value
+      xid,
+      flags
     )
 
     val deserializedCmd = Using(new ByteArrayOutputStream()) {
@@ -51,14 +50,13 @@ class PutCommandTest {
         a =>
           Using(new ByteArrayInputStream(a)) {
             is =>
-              this.factory.deserializer.deserialize[PutCommand](is)
+              this.factory.deserializer.deserialize[XaEndTransactionCommand](is)
           }
       }
       .get
     Assertions.assertNotNull(deserializedCmd)
     Assertions.assertEquals(cmd.sequence, deserializedCmd.sequence)
-    Assertions.assertEquals(cmd.spaceName, deserializedCmd.spaceName)
-    Assertions.assertEquals(cmd.key, deserializedCmd.key)
-    Assertions.assertEquals(cmd.value, deserializedCmd.value)
+    Assertions.assertEquals(cmd.xid, deserializedCmd.xid)
+    Assertions.assertEquals(cmd.flags, deserializedCmd.flags)
   }
 }
