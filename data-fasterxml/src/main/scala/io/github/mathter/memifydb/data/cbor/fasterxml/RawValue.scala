@@ -7,6 +7,7 @@ import tools.jackson.databind.ObjectMapper
 import java.lang.ref.{Reference, SoftReference}
 import java.util
 import scala.reflect.ClassTag
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -33,7 +34,7 @@ class RawValue[T](private val x: Array[Byte])
   inline override def get(using classTag: ClassTag[T]): T = {
     var now: T = null.asInstanceOf[T]
 
-    if (this.reference == null && (now = this.reference.get()) == null) {
+    if (this.reference == null || (now = this.reference.get()) == null) {
       now = this.calc
       this.reference = new SoftReference[Opt[T]](Opt(now))
       now
