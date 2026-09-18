@@ -34,7 +34,7 @@ class SerizationFactoryProviderV1 extends SerizationFactoryProvider {
           case x: ValueSerelizationFactory => x
           case x => throw new IllegalStateException(s"${x} is not valid ValueSerelizationFactory!")
         }
-        .get
+        .getOrElse(ValueSerelizationFactory.apply(Const.defaultValueSerializationFactoryId))
     } else {
       ValueSerelizationFactory.apply(Const.defaultValueSerializationFactoryId)
     }

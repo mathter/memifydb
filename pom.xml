@@ -16,6 +16,7 @@
         <module>transaction-api</module>
         <module>space-simple</module>
         <module>command</module>
+        <module>network</module>
     </modules>
 
     <properties>
