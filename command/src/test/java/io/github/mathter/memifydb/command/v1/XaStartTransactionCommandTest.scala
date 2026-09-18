@@ -7,6 +7,7 @@ import org.junit.jupiter.api.{Assertions, Test}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.util.Using
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -23,7 +24,7 @@ import scala.util.Using
  * limitations under the License.
  *
  */
-class XaPrepareTransactionCommandTest {
+class XaStartTransactionCommandTest {
   val provider = SerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
@@ -35,9 +36,11 @@ class XaPrepareTransactionCommandTest {
       RandomUtils.insecure().randomBytes(10),
       RandomUtils.insecure().randomBytes(10)
     )
-    val cmd = new XaPrepareTransactionCommand(
+    val flags = RandomUtils.insecure().randomInt()
+    val cmd = new XaStartTransactionCommand(
       Sequence(RandomUtils.insecure().randomLong()),
-      xid
+      xid,
+      flags
     )
 
     val deserializedCmd = Using(new ByteArrayOutputStream()) {
@@ -48,12 +51,13 @@ class XaPrepareTransactionCommandTest {
         a =>
           Using(new ByteArrayInputStream(a)) {
             is =>
-              this.factory.deserializer.deserialize[XaPrepareTransactionCommand](is)
+              this.factory.deserializer.deserialize[XaStartTransactionCommand](is)
           }
       }
       .get
     Assertions.assertNotNull(deserializedCmd)
     Assertions.assertEquals(cmd.sequence, deserializedCmd.sequence)
     Assertions.assertEquals(cmd.xid, deserializedCmd.xid)
+    Assertions.assertEquals(cmd.flags, deserializedCmd.flags)
   }
 }

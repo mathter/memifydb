@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.util.IOUtil
-import io.github.mathter.memifydb.command.{Command, CommandDeserializer}
+import io.github.mathter.memifydb.command.{Command, Deserializer, Desc, Result, Sequencable}
 import io.github.mathter.memifydb.common.data.ValueDeserializer
 import io.github.mathter.memifydb.common.util.ByteArray
 
@@ -24,13 +24,15 @@ import scala.reflect.ClassTag
  * limitations under the License.
  *
  */
-private class CommandDeserializerV1(private val valueDeserializer: ValueDeserializer) extends CommandDeserializer {
-  override def deserialize[T <: Command](using is: InputStream): T = {
+private class DeserializerV1(private val valueDeserializer: ValueDeserializer) extends Deserializer {
+  override def deserialize[T <: Desc & Sequencable](is: InputStream): T = {
+    given _is: InputStream = is
+
     val prefix = PrefixV1(is.readNBytes(2))
 
     (prefix match {
       case GetCommand.prefix => {
-        implicit val classTag: ClassTag[Nothing] = ClassTag(classOf[Object])
+        given classTag: ClassTag[Nothing] = ClassTag(classOf[Object])
 
         new GetCommand(
           IOUtil.readSequence,
@@ -70,6 +72,52 @@ private class CommandDeserializerV1(private val valueDeserializer: ValueDeserial
         new XaPrepareTransactionCommand(
           IOUtil.readSequence,
           IOUtil.readXid
+        )
+      }
+
+      case XaRecoverTransactionCommand.prefix => {
+        new XaRecoverTransactionCommand(
+          IOUtil.readSequence,
+          ByteArray.readIntRaw(is)
+        )
+      }
+
+      case XaRollbackTransactionCommand.prefix => {
+        new XaRollbackTransactionCommand(
+          IOUtil.readSequence,
+          IOUtil.readXid
+        )
+      }
+
+      case XaStartTransactionCommand.prefix => {
+        new XaStartTransactionCommand(
+          IOUtil.readSequence,
+          IOUtil.readXid,
+          ByteArray.readIntRaw(is)
+        )
+      }
+
+      case XaContainerCommand.prefix => {
+        val sequence = IOUtil.readSequence
+        val xid = IOUtil.readXid
+        val commandCount = ByteArray.readIntRaw(is)
+        val commands = (0 until commandCount).map(e => this.deserialize(is).asInstanceOf[Command]).toList
+
+        new XaContainerCommand(sequence, xid, commands *)
+      }
+
+      case VoidResult.prefix => {
+        new VoidResult(
+          IOUtil.readSequence
+        )
+      }
+
+      case ValueResult.prefix => {
+        given classTag: ClassTag[Nothing] = ClassTag(classOf[Object])
+
+        new ValueResult(
+          IOUtil.readSequence,
+          this.valueDeserializer.deserialize(IOUtil.readValueRaw)
         )
       }
 

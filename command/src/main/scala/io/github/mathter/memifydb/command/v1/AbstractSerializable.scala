@@ -1,4 +1,6 @@
-package io.github.mathter.memifydb.command
+package io.github.mathter.memifydb.command.v1
+
+import io.github.mathter.memifydb.command.{Command, Desc, Prefix, Sequencable, Sequence}
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -16,12 +18,17 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait Prefix {
-  def toByteArray: Array[Byte]
+private abstract class AbstractSerializable(val sequence: Sequence) extends Desc, Sequencable {
+  private final val commandDesc = AbstractSerializable.o(this.getClass)
+
+  override def prefix: Prefix = this.commandDesc.prefix
 }
 
-trait PrefixFactory[T <: Prefix] {
-  def apply(x: Array[Byte]): T
-
-  def unapply(x: T): Array[Byte]
+private object AbstractSerializable {
+  def o[T](clazz: Class[T]): Desc = {
+    Class.forName(clazz.getName + "$")
+      .getField("MODULE$")
+      .get(null)
+      .asInstanceOf[Desc]
+  }
 }

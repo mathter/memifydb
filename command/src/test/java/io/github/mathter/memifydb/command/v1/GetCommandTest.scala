@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.{CommandSerizationFactoryProvider, Sequence}
+import io.github.mathter.memifydb.command.{SerizationFactoryProvider, Sequence}
 import org.apache.commons.lang3.{RandomStringUtils, RandomUtils}
 import org.junit.jupiter.api.{Assertions, Test}
 
@@ -24,7 +24,7 @@ import scala.util.Using
  *
  */
 class GetCommandTest {
-  val provider = CommandSerizationFactoryProvider.apply(Const.id)
+  val provider = SerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
 

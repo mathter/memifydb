@@ -1,12 +1,12 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.{SerizationFactoryProvider, Sequence}
-import io.github.mathter.memifydb.transaction.xa.Xid
 import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.{Assertions, Test}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.util.Using
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -23,21 +23,17 @@ import scala.util.Using
  * limitations under the License.
  *
  */
-class XaPrepareTransactionCommandTest {
+class XaRecoverTransactionCommandTest {
   val provider = SerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
 
   @Test
   def test(): Unit = {
-    val xid = Xid(
-      RandomUtils.insecure().randomInt(),
-      RandomUtils.insecure().randomBytes(10),
-      RandomUtils.insecure().randomBytes(10)
-    )
-    val cmd = new XaPrepareTransactionCommand(
+    val flags = RandomUtils.insecure().randomInt()
+    val cmd = new XaRecoverTransactionCommand(
       Sequence(RandomUtils.insecure().randomLong()),
-      xid
+      flags
     )
 
     val deserializedCmd = Using(new ByteArrayOutputStream()) {
@@ -48,12 +44,12 @@ class XaPrepareTransactionCommandTest {
         a =>
           Using(new ByteArrayInputStream(a)) {
             is =>
-              this.factory.deserializer.deserialize[XaPrepareTransactionCommand](is)
+              this.factory.deserializer.deserialize[XaRecoverTransactionCommand](is)
           }
       }
       .get
     Assertions.assertNotNull(deserializedCmd)
     Assertions.assertEquals(cmd.sequence, deserializedCmd.sequence)
-    Assertions.assertEquals(cmd.xid, deserializedCmd.xid)
+    Assertions.assertEquals(cmd.flags, deserializedCmd.flags)
   }
 }

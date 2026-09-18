@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.{CommandDesc, Prefix, Sequence}
+import io.github.mathter.memifydb.command.{Desc, Prefix, Sequence}
 import io.github.mathter.memifydb.common.data.Value
 
 /**
@@ -25,6 +25,6 @@ class RemoveCommand(sequence: Sequence,
   extends AbstractCommand(sequence) {
 }
 
-object RemoveCommand extends CommandDesc {
+object RemoveCommand extends Desc {
   val prefix: Prefix = PrefixV1(Array(0x01, 0x03))
 }

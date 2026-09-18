@@ -1,5 +1,3 @@
-package io.github.mathter.memifydb.command
-
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -16,12 +14,12 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait Prefix {
-  def toByteArray: Array[Byte]
-}
+package io.github.mathter.memifydb.command
 
-trait PrefixFactory[T <: Prefix] {
-  def apply(x: Array[Byte]): T
+import java.io.{IOException, OutputStream}
 
-  def unapply(x: T): Array[Byte]
+
+trait Serializer {
+  @throws[IOException]
+  def serialize(os: OutputStream, command: Desc & Sequencable): Boolean
 }

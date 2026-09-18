@@ -1,4 +1,8 @@
-package io.github.mathter.memifydb.command
+package io.github.mathter.memifydb.command.v1
+
+import io.github.mathter.memifydb.command.{Desc, Prefix, Sequence}
+
+import javax.transaction.xa.Xid
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -16,12 +20,9 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait Prefix {
-  def toByteArray: Array[Byte]
+class XaRollbackTransactionCommand(sequence: Sequence, xid: Xid) extends AbstractXaCommand(sequence, xid) {
 }
 
-trait PrefixFactory[T <: Prefix] {
-  def apply(x: Array[Byte]): T
-
-  def unapply(x: T): Array[Byte]
+object XaRollbackTransactionCommand extends Desc {
+  val prefix: Prefix = PrefixV1(Array(0x10, 0x06))
 }

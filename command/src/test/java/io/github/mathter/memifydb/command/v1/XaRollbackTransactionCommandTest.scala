@@ -7,6 +7,7 @@ import org.junit.jupiter.api.{Assertions, Test}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.util.Using
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -23,7 +24,7 @@ import scala.util.Using
  * limitations under the License.
  *
  */
-class XaPrepareTransactionCommandTest {
+class XaRollbackTransactionCommandTest {
   val provider = SerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
@@ -35,7 +36,7 @@ class XaPrepareTransactionCommandTest {
       RandomUtils.insecure().randomBytes(10),
       RandomUtils.insecure().randomBytes(10)
     )
-    val cmd = new XaPrepareTransactionCommand(
+    val cmd = new XaRollbackTransactionCommand(
       Sequence(RandomUtils.insecure().randomLong()),
       xid
     )
@@ -48,7 +49,7 @@ class XaPrepareTransactionCommandTest {
         a =>
           Using(new ByteArrayInputStream(a)) {
             is =>
-              this.factory.deserializer.deserialize[XaPrepareTransactionCommand](is)
+              this.factory.deserializer.deserialize[XaRollbackTransactionCommand](is)
           }
       }
       .get

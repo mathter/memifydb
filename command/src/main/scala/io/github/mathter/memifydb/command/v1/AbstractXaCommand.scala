@@ -20,5 +20,5 @@ import javax.transaction.xa.Xid
  * limitations under the License.
  *
  */
-class AbstractXaCommand(sequence: Sequence, val xid: Xid) extends AbstractCommand(sequence) {
+private abstract class AbstractXaCommand(sequence: Sequence, val xid: Xid) extends AbstractCommand(sequence) {
 }

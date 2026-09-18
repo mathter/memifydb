@@ -17,7 +17,7 @@ package io.github.mathter.memifydb.command.v1
  *
  */
 object Const {
-  final val id = classOf[CommandSerizationFactoryProviderV1].getName
+  final val id = classOf[SerizationFactoryProviderV1].getName
 
   final val propertyValueSerializationFactory = "serialization-factory-id"
 

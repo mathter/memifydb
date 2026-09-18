@@ -16,12 +16,5 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait Prefix {
-  def toByteArray: Array[Byte]
-}
-
-trait PrefixFactory[T <: Prefix] {
-  def apply(x: Array[Byte]): T
-
-  def unapply(x: T): Array[Byte]
+trait Result extends Desc, Sequencable {
 }

@@ -1,4 +1,7 @@
-package io.github.mathter.memifydb.command
+package io.github.mathter.memifydb.command.v1
+
+import io.github.mathter.memifydb.command.SerizationFactoryProvider
+import org.junit.jupiter.api.{Assertions, Test}
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -16,12 +19,16 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait Prefix {
-  def toByteArray: Array[Byte]
-}
+class SerizationFactoryProviderTest {
+  @Test
+  def test(): Unit = {
+    val provider = SerizationFactoryProvider.apply(Const.id)
+    Assertions.assertNotNull(provider)
 
-trait PrefixFactory[T <: Prefix] {
-  def apply(x: Array[Byte]): T
+    val factoty = provider.instance(Map(Const.propertyValueSerializationFactory -> Const.defaultValueSerializationFactoryId))
+    Assertions.assertNotNull(factoty)
 
-  def unapply(x: T): Array[Byte]
+    val factory1 = provider.instance()
+    Assertions.assertNotNull(factoty)
+  }
 }

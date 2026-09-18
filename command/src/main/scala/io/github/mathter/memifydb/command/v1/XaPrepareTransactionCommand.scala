@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.{CommandDesc, Prefix, Sequence}
+import io.github.mathter.memifydb.command.{Desc, Prefix, Sequence}
 
 import javax.transaction.xa.Xid
 
@@ -23,6 +23,6 @@ import javax.transaction.xa.Xid
 class XaPrepareTransactionCommand(sequence: Sequence, xid: Xid) extends AbstractXaCommand(sequence, xid) {
 }
 
-object XaPrepareTransactionCommand extends CommandDesc {
+object XaPrepareTransactionCommand extends Desc {
   val prefix: Prefix = PrefixV1(Array(0x10, 0x04))
 }

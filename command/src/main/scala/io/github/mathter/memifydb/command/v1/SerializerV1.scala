@@ -1,10 +1,11 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.util.IOUtil
-import io.github.mathter.memifydb.command.{Command, CommandSerializer}
+import io.github.mathter.memifydb.command.{Command, Serializer, Desc, Result, Sequencable}
 import io.github.mathter.memifydb.common.util.ByteArray
 
 import java.io.OutputStream
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -21,8 +22,10 @@ import java.io.OutputStream
  * limitations under the License.
  *
  */
-private class CommandSerializerV1 extends CommandSerializer {
-  override def serialize(using os: OutputStream, command: Command): Boolean = {
+private class SerializerV1 extends Serializer {
+  override def serialize(os: OutputStream, command: Desc & Sequencable): Boolean = {
+    given _os: OutputStream = os
+
     os.write(command.prefix.toByteArray)
     IOUtil.write(command.sequence)
 
@@ -30,7 +33,6 @@ private class CommandSerializerV1 extends CommandSerializer {
       case x: GetCommand => {
         IOUtil.write(x.spaceName)
         IOUtil.write(x.key)
-
         true
       }
 
@@ -38,27 +40,62 @@ private class CommandSerializerV1 extends CommandSerializer {
         IOUtil.write(x.spaceName)
         IOUtil.write(x.key)
         IOUtil.write(x.value)
-
         true
       }
 
       case x: XaCommitTransactionCommand => {
         IOUtil.write(x.xid)
         IOUtil.write(x.onePhase)
-
         true
       }
 
       case x: XaEndTransactionCommand => {
         IOUtil.write(x.xid)
         ByteArray.writeIntRaw(os, x.flags)
-
         true
       }
 
       case x: XaPrepareTransactionCommand => {
         IOUtil.write(x.xid)
+        true
+      }
 
+      case x: XaRecoverTransactionCommand => {
+        ByteArray.writeIntRaw(os, x.flags)
+        true
+      }
+
+      case x: XaRollbackTransactionCommand => {
+        IOUtil.write(x.xid)
+        true
+      }
+
+      case x: XaStartTransactionCommand => {
+        IOUtil.write(x.xid)
+        ByteArray.writeIntRaw(os, x.flags)
+        true
+      }
+
+      case x: XaContainerCommand => {
+        IOUtil.write(x.xid)
+
+        if (x.commands == null || x.commands.isEmpty) {
+          ByteArray.writeIntRaw(os, 0)
+        } else {
+          ByteArray.writeIntRaw(os, x.commands.size)
+          x.commands.foreach(e => this.serialize(os, e))
+        }
+        true
+      }
+
+      case x: VoidResult => {
+        IOUtil.write(x.sequence)
+        true
+      }
+
+      case x: ValueResult[?] => {
+        IOUtil.write(x.sequence)
+        IOUtil.write(x.value)
         true
       }
 

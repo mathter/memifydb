@@ -1,7 +1,8 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.CommandSerizationFactoryProvider
-import org.junit.jupiter.api.{Assertions, Test}
+import io.github.mathter.memifydb.command.{Desc, Prefix, Sequence}
+
+import javax.transaction.xa.Xid
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -19,16 +20,9 @@ import org.junit.jupiter.api.{Assertions, Test}
  * limitations under the License.
  *
  */
-class CommandSerizationFactoryProviderTest {
-  @Test
-  def test(): Unit = {
-    val provider = CommandSerizationFactoryProvider.apply(Const.id)
-    Assertions.assertNotNull(provider)
+class XaStartTransactionCommand(sequence: Sequence, xid: Xid, val flags: Int) extends AbstractXaCommand(sequence, xid) {
+}
 
-    val factoty = provider.instance(Map(Const.propertyValueSerializationFactory -> Const.defaultValueSerializationFactoryId))
-    Assertions.assertNotNull(factoty)
-
-    val factory1 = provider.instance()
-    Assertions.assertNotNull(factoty)
-  }
+object XaStartTransactionCommand extends Desc {
+  val prefix: Prefix = PrefixV1(Array(0x10, 0x07))
 }
