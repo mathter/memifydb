@@ -1,8 +1,3 @@
-package io.github.mathter.memifydb.command.v1
-
-import io.github.mathter.memifydb.command.CommandSerizationFactory
-import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
-
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -17,8 +12,12 @@ import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  */
-trait CommandSerizationFactoryV1 extends CommandSerizationFactory {
-  def valueSerelizationFactory: ValueSerelizationFactory
+package io.github.mathter.memifydb.core.command
+
+import io.github.mathter.memifydb.command.{Command, Desc, Sequencable}
+
+trait CommandProcessor {
+  def process(context: Context, command: Command): Desc & Sequencable
 }

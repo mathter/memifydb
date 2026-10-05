@@ -20,24 +20,18 @@ import io.github.mathter.memifydb.network.NetworkFactory
 import org.junit.jupiter.api.{Assertions, Test}
 
 import java.net.{InetAddress, Socket}
+import javax.net.ServerSocketFactory
 
 class SocketNetworkFactoryTest {
   @Test
   def test(): Unit = {
-    val socketAcceptor = new SocketHandler {
-      override def handle(socket: Socket): Handle = new Handle {
-        override def release(): Unit = {
-        }
-      }
-    }
-
     val factory = NetworkFactory(Const.id)
     Assertions.assertNotNull(factory)
 
     val network = factory.instance("testNetwork", Map(
       Const.propertyAddress -> "localhost",
       Const.propertyPort -> 9999,
-      Const.propertySocketHandler -> socketAcceptor
+      Const.propertyServerSocketFactory -> ServerSocketFactory.getDefault
     ))
     Assertions.assertNotNull(network)
 
@@ -46,7 +40,8 @@ class SocketNetworkFactoryTest {
     val socket = new Socket(InetAddress.getByName("localhost"), 9999)
     Assertions.assertTrue(socket.isConnected)
 
-    socket.getOutputStream.write(0)
+    socket.getOutputStream.write(Array[Byte](0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+    Thread.sleep(1000)
     socket.close()
 
     network.close()

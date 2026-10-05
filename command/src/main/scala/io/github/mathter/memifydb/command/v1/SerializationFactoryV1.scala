@@ -1,3 +1,8 @@
+package io.github.mathter.memifydb.command.v1
+
+import io.github.mathter.memifydb.command.SerializationFactory
+import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -14,8 +19,6 @@
  * limitations under the License.
  *
  */
-package io.github.mathter.memifydb.network.socket
-
-trait Handle {
-  def release(): Unit
+trait SerializationFactoryV1 extends SerializationFactory {
+  def valueSerelizationFactory: ValueSerelizationFactory
 }

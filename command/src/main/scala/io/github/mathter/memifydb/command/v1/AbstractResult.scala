@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.Sequence
+import io.github.mathter.memifydb.command.{Result, Sequence}
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -18,6 +18,6 @@ import io.github.mathter.memifydb.command.Sequence
  * limitations under the License.
  *
  */
-private abstract class AbstractResult(sequence: Sequence) extends AbstractSerializable(sequence) {
+private abstract class AbstractResult(sequence: Sequence) extends AbstractSerializable(sequence), Result {
 
 }

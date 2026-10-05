@@ -4,9 +4,8 @@ import io.github.mathter.memifydb.common.data.Value
 import io.github.mathter.memifydb.common.util.Opt
 import io.github.mathter.memifydb.space.KeyValueOperations
 import io.github.mathter.memifydb.space.simple.Status.NEW
-import io.github.mathter.memifydb.space.simple.XaOperations.log
+import org.slf4j.LoggerFactory
 
-import java.util.logging.Logger
 import javax.transaction.xa.Xid
 import scala.collection.mutable
 
@@ -41,8 +40,6 @@ private class XaOperations(val xid: Xid, val resource: SimpleXaResource) extends
    * @return Opt wrapper of value.
    */
   override def apply[K, V](key: Value[K]): Opt[Value[V]] = {
-    log.severe(() => s"apply(${key}) is called for resource=${this.resource}")
-
     this.map.getOrElse(key, Opt.empty).asInstanceOf[Opt[Value[V]]]
   }
 
@@ -55,8 +52,6 @@ private class XaOperations(val xid: Xid, val resource: SimpleXaResource) extends
    * @throws DifferentKeyTypeException if the key is of a different type from the keys in the storage.
    */
   override def update[K, V, R](key: Value[K], value: Value[V]): Opt[Value[R]] = {
-    log.severe(() => s"update(${key}, ${value}) is called for resource=${this.resource}")
-
     if (Status.STARTED eq this.status) {
       val origin = this.resource.space.operations.getSafe(key)
 
@@ -75,7 +70,6 @@ private class XaOperations(val xid: Xid, val resource: SimpleXaResource) extends
    * @return previous value specified by the key or [[Opt.empty]] otherwise.
    */
   override def remove[R](key: Value[Any]): Opt[Value[R]] = {
-    log.severe(() => s"remove(${key}) is called for resource=${this.resource}")
     val origin = this.resource.space.operations.getSafe(key)
 
     this.map.put(key, XaOperations.Record(origin, null))
@@ -84,14 +78,11 @@ private class XaOperations(val xid: Xid, val resource: SimpleXaResource) extends
   }
 
   override def clear(): Unit = {
-    log.severe(() => s"clear() is called for resource=${this.resource}")
     this.map.clear()
   }
 }
 
 private object XaOperations {
-  private val log = Logger.getLogger(classOf[XaOperations].getName)
-
   case class Record(origin: Opt[Value[? <: Any]], thisVal: Opt[Value[? <: Any]]) {
   }
 }

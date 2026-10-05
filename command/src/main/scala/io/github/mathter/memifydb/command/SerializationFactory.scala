@@ -16,7 +16,7 @@ package io.github.mathter.memifydb.command
  * limitations under the License.
  *
  */
-trait CommandSerizationFactory {
+trait SerializationFactory {
   def serializer: Serializer
 
   def deserializer: Deserializer

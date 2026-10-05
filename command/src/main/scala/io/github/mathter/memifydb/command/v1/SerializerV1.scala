@@ -1,10 +1,11 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.util.IOUtil
-import io.github.mathter.memifydb.command.{Command, Serializer, Desc, Result, Sequencable}
+import io.github.mathter.memifydb.command.{Command, Desc, Result, Sequencable, Serializer}
 import io.github.mathter.memifydb.common.util.ByteArray
 
 import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
@@ -40,6 +41,21 @@ private class SerializerV1 extends Serializer {
         IOUtil.write(x.spaceName)
         IOUtil.write(x.key)
         IOUtil.write(x.value)
+        true
+      }
+
+      case x: UnitCommand => {
+        true
+      }
+
+      case x: InitCommand => {
+        IOUtil.write(x.baseSerializationProtocal.getBytes(StandardCharsets.UTF_8))
+        true
+      }
+
+      case x: SayHelloCommand => {
+        IOUtil.write(x.login.getBytes(StandardCharsets.UTF_8))
+        IOUtil.write(x.password)
         true
       }
 
@@ -89,13 +105,16 @@ private class SerializerV1 extends Serializer {
       }
 
       case x: VoidResult => {
-        IOUtil.write(x.sequence)
         true
       }
 
       case x: ValueResult[?] => {
-        IOUtil.write(x.sequence)
         IOUtil.write(x.value)
+        true
+      }
+
+      case x: IllegalCommandResult => {
+        IOUtil.write(x.data)
         true
       }
 

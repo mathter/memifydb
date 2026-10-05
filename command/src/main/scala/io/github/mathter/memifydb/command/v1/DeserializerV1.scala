@@ -1,11 +1,12 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.util.IOUtil
-import io.github.mathter.memifydb.command.{Command, Deserializer, Desc, Result, Sequencable}
+import io.github.mathter.memifydb.command.{Command, Desc, Deserializer, Result, Sequencable}
 import io.github.mathter.memifydb.common.data.ValueDeserializer
 import io.github.mathter.memifydb.common.util.ByteArray
 
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
 import scala.reflect.ClassTag
 
 /**
@@ -49,6 +50,25 @@ private class DeserializerV1(private val valueDeserializer: ValueDeserializer) e
           this.valueDeserializer.deserialize(IOUtil.readValueRaw),
           this.valueDeserializer.deserialize(IOUtil.readValueRaw),
           this.valueDeserializer.deserialize(IOUtil.readValueRaw)
+        )
+      }
+
+      case UnitCommand.prefix => {
+        new UnitCommand(IOUtil.readSequence)
+      }
+
+      case InitCommand.prefix => {
+        new InitCommand(
+          IOUtil.readSequence,
+          new String(IOUtil.readArray, StandardCharsets.UTF_8)
+        )
+      }
+
+      case SayHelloCommand.prefix => {
+        new SayHelloCommand(
+          IOUtil.readSequence,
+          new String(IOUtil.readArray, StandardCharsets.UTF_8),
+          IOUtil.readArray
         )
       }
 
@@ -118,6 +138,13 @@ private class DeserializerV1(private val valueDeserializer: ValueDeserializer) e
         new ValueResult(
           IOUtil.readSequence,
           this.valueDeserializer.deserialize(IOUtil.readValueRaw)
+        )
+      }
+
+      case IllegalCommandResult.prefix => {
+        new IllegalCommandResult(
+          IOUtil.readSequence,
+          IOUtil.readArray
         )
       }
 

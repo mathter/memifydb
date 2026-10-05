@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.command.v1
 
-import io.github.mathter.memifydb.command.{Deserializer, Serializer, CommandSerizationFactory, SerizationFactoryProvider}
+import io.github.mathter.memifydb.command.{Deserializer, Serializer, SerializationFactory, SerizationFactoryProvider}
 import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
 
 /**
@@ -22,8 +22,8 @@ import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
 class SerizationFactoryProviderV1 extends SerizationFactoryProvider {
   override def id: String = Const.id
 
-  override def instance(properties: Map[Any, Any]): CommandSerizationFactory = {
-    new SerizationFactoryV1Impl(this.buildValueSerelizationFactory(properties))
+  override def instance(properties: Map[Any, Any]): SerializationFactory = {
+    new SerializationFactoryV1Impl(this.buildValueSerelizationFactory(properties))
   }
 
   private def buildValueSerelizationFactory(properties: Map[Any, Any]): ValueSerelizationFactory = {
@@ -41,7 +41,7 @@ class SerizationFactoryProviderV1 extends SerizationFactoryProvider {
   }
 }
 
-private class SerizationFactoryV1Impl(val valueSerelizationFactory: ValueSerelizationFactory) extends CommandSerizationFactoryV1 {
+private class SerializationFactoryV1Impl(val valueSerelizationFactory: ValueSerelizationFactory) extends SerializationFactoryV1 {
   override def serializer: Serializer = new SerializerV1
 
   override def deserializer: Deserializer = new DeserializerV1(this.valueSerelizationFactory.deserializer)

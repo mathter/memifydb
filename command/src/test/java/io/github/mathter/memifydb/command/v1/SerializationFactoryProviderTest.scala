@@ -19,7 +19,7 @@ import org.junit.jupiter.api.{Assertions, Test}
  * limitations under the License.
  *
  */
-class SerizationFactoryProviderTest {
+class SerializationFactoryProviderTest {
   @Test
   def test(): Unit = {
     val provider = SerizationFactoryProvider.apply(Const.id)

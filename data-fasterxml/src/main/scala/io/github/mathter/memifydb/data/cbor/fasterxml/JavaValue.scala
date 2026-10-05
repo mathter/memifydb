@@ -6,7 +6,9 @@ import tools.jackson.databind.ObjectMapper
 
 import java.lang.ref.SoftReference
 import java.util
+import java.util.Objects
 import scala.reflect.ClassTag
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -43,8 +45,4 @@ case class JavaValue[T](private val x: T)
   override def get(using classTag: ClassTag[T]): T = this.x
 
   inline def calc: Array[Byte] = this.mapper.writeValueAsBytes(this.x)
-
-  override def hashCode(): Int = util.Arrays.hashCode(this.raw)
-
-  override def equals(obj: Any): Boolean = super.equals(obj)
 }

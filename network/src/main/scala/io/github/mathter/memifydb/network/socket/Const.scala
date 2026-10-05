@@ -19,6 +19,8 @@ package io.github.mathter.memifydb.network.socket
 object Const {
   val id = classOf[SocketNetworkFactory].getName
 
+  val propertyServerSocketFactory = "server-socket-factory"
+
   val propertyAddress = "address"
 
   val propertyPort = "port"
@@ -36,4 +38,6 @@ object Const {
   val defaultSerializationFactory = Const.id
 
   val propertySocketHandler = "socket-handler"
+
+  val defaultSocketHandler = new EchoSocketHandler
 }

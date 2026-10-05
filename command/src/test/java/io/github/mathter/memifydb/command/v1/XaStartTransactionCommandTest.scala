@@ -27,7 +27,7 @@ import scala.util.Using
 class XaStartTransactionCommandTest {
   val provider = SerizationFactoryProvider.apply(Const.id)
 
-  val factory = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
+  val factory = this.provider.instance().asInstanceOf[SerializationFactoryV1]
 
   @Test
   def test(): Unit = {

@@ -19,5 +19,5 @@ package io.github.mathter.memifydb.network.socket
 import java.net.Socket
 
 trait SocketHandler {
-  def handle(socket: Socket): Handle
+  def handle(socket: Socket, network: SocketNetwork): Handler
 }

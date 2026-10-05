@@ -12,27 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * <p>
  */
-package io.github.mathter.memifydb.network.socket
+package io.github.mathter.memifydb.core.command
 
-import java.net.Socket
-import java.util.logging.Logger
+import scala.collection.mutable
 
-private class CommandSocketHandler extends SocketHandler {
-  override def handle(socket: Socket): Handle = {
-    CommandSocketHandler.log.info(() => s"Handle socket ${socket}")
-
-    new CommandHandle(socket)
-  }
-}
-
-object CommandSocketHandler {
-  private val log = Logger.getLogger(classOf[CommandSocketHandler].getName)
-}
-
-private class CommandHandle(val socket: Socket) extends Handle {
-  override def release(): Unit = {
-    this.socket.close();
-  }
+trait Context extends AutoCloseable {
+  def params: mutable.Map[Any, Any]
 }

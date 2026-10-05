@@ -19,18 +19,32 @@ package io.github.mathter.memifydb.network.socket
 import io.github.mathter.memifydb.network.{Network, NetworkFactory}
 
 import java.net.InetAddress
+import javax.net.ServerSocketFactory
 
 class SocketNetworkFactory extends NetworkFactory {
   override def id: String = Const.id
 
   override def instance(name: String, properties: Map[Any, Any]): Network = {
     new SocketNetwork(
+      this.buildServerSocketFactory(properties),
       this.buildAddress(properties),
       this.buildPort(properties),
       this.buildBacklog(properties),
       this.buildMaxConnectionCount(properties),
       this.buildSocketAcceptor(properties)
     )
+  }
+
+  private def buildServerSocketFactory(properties: Map[Any, Any]): ServerSocketFactory = {
+    if (properties != null) {
+      properties.get(Const.propertyServerSocketFactory)
+        .map {
+          case x: ServerSocketFactory => x
+        }
+        .getOrElse(throw new IllegalStateException(s"There is no ${Const.propertyServerSocketFactory}!"))
+    } else {
+      throw new IllegalStateException(s"There is no ${Const.propertyServerSocketFactory}!")
+    }
   }
 
   private def buildAddress(properties: Map[Any, Any]): InetAddress = {
@@ -96,9 +110,9 @@ class SocketNetworkFactory extends NetworkFactory {
           case x: SocketHandler => x
           case x => throw new IllegalStateException(s"'${x} invalid ${Const.propertySocketHandler} format")
         }
-        .getOrElse(new CommandSocketHandler)
+        .getOrElse(Const.defaultSocketHandler)
     } else {
-      new CommandSocketHandler
+      Const.defaultSocketHandler
     }
   }
 }

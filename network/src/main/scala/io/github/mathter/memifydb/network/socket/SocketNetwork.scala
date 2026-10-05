@@ -18,23 +18,26 @@ package io.github.mathter.memifydb.network.socket
 
 import io.github.mathter.memifydb.network.Network
 import io.github.mathter.memifydb.network.socket.SocketNetwork.{cleaner, log}
+import org.slf4j.LoggerFactory
 
 import java.lang.ref.Cleaner
 import java.net.{InetAddress, ServerSocket}
 import java.util.logging.{Level, Logger}
+import javax.net.ServerSocketFactory
 import scala.collection.mutable
 import scala.compiletime.uninitialized
 
-private class SocketNetwork(
-                             val address: InetAddress,
-                             val port: Int,
-                             val backlog: Int,
-                             val maxConnectionCount: Int,
-                             val socketHandler: SocketHandler
-                           ) extends Network {
+class SocketNetwork(
+                     val serverSocketFactory: ServerSocketFactory,
+                     val address: InetAddress,
+                     val port: Int,
+                     val backlog: Int,
+                     val maxConnectionCount: Int,
+                     val socketHandler: SocketHandler
+                   ) extends Network {
   private val thread = new Thread(new AcceptorLoop)
 
-  private val handles: mutable.Set[Handle] = mutable.Set.empty
+  private val handlers: mutable.Set[Handler] = mutable.Set.empty
 
   private var serverSocket: ServerSocket = uninitialized
 
@@ -46,7 +49,7 @@ private class SocketNetwork(
         this.close()
       } catch {
         case e: Exception =>
-          SocketNetwork.log.severe(s"Error while network ${this} closing!")
+          SocketNetwork.log.error(s"Error while network ${this} closing!")
       }
     })
   }
@@ -61,12 +64,12 @@ private class SocketNetwork(
   def close(): Unit = {
     SocketNetwork.log.info(s"Network ${this} closing...")
     this.thread.interrupt()
-    this.handles.foreach(e =>
+    this.handlers.foreach(e =>
       try {
-        e.release()
+        e.close()
       } catch {
         case x: Exception =>
-          log.log(Level.SEVERE, s"Error is occurred while client socket closing! Network ${this}", e)
+          log.error(s"Error is occurred while client socket closing! Network ${this}", e)
       }
     )
   }
@@ -75,7 +78,7 @@ private class SocketNetwork(
     override def run(): Unit = {
       SocketNetwork.log.info(s"Listening of ${SocketNetwork.this.address}:${SocketNetwork.this.port} started...")
 
-      SocketNetwork.this.serverSocket = new ServerSocket(
+      SocketNetwork.this.serverSocket = SocketNetwork.this.serverSocketFactory.createServerSocket(
         SocketNetwork.this.port,
         SocketNetwork.this.backlog,
         SocketNetwork.this.address
@@ -86,17 +89,17 @@ private class SocketNetwork(
           val socket = SocketNetwork.this.serverSocket.accept()
           SocketNetwork.log.info(s"Accept connection from ${socket.getRemoteSocketAddress}. Network ${SocketNetwork.this}")
 
-          if (SocketNetwork.this.handles.size >= SocketNetwork.this.maxConnectionCount) {
+          if (SocketNetwork.this.handlers.size >= SocketNetwork.this.maxConnectionCount) {
             socket.close()
             SocketNetwork.log.info(s"Max connection count reached for network ${SocketNetwork.this}")
           } else {
-            val socketOwner = SocketNetwork.this.socketHandler.handle(socket)
-            SocketNetwork.this.handles.add(socketOwner)
+            val socketOwner = SocketNetwork.this.socketHandler.handle(socket, SocketNetwork.this)
+            SocketNetwork.this.handlers.add(socketOwner)
           }
 
         } catch {
           case e: Exception =>
-            SocketNetwork.log.log(Level.SEVERE, s"Error is occurred while socket accepting", e)
+            SocketNetwork.log.error(s"Error is occurred while socket accepting", e)
         }
       }
     }
@@ -104,7 +107,7 @@ private class SocketNetwork(
 }
 
 object SocketNetwork {
-  private val log = Logger.getLogger(classOf[SocketNetwork].getName)
+  private val log = LoggerFactory.getLogger(classOf[SocketNetwork])
 
   private val cleaner = Cleaner.create()
 }

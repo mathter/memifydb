@@ -4,6 +4,7 @@ import io.github.mathter.memifydb.space.KeyValueOperations
 import io.github.mathter.memifydb.space.simple.SimpleXaResource.log
 import io.github.mathter.memifydb.space.simple.Status.{ROLLING_BACK, STARTED}
 import io.github.mathter.memifydb.transaction.xa.{XaException, XaResourceProvider}
+import org.slf4j.LoggerFactory
 
 import java.lang.ref.Cleaner
 import java.util.concurrent.ConcurrentHashMap
@@ -63,7 +64,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
       } catch {
         case e: InterruptedException => {
           Thread.currentThread.interrupt()
-          log.severe(s"Cleanup thread is interrupted! resource=${this}")
+          log.error(s"Cleanup thread is interrupted! resource=${this}")
         }
       }
     }
@@ -77,7 +78,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
       try {
         this.close();
       } catch {
-        case e: Exception => log.log(Level.SEVERE, s"Error closing XAResource resource=${this}", e)
+        case e: Exception => log.error(s"Error closing XAResource resource=${this}", e)
       }
     })
 
@@ -87,7 +88,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def commit(xid: Xid, onePhase: Boolean): Unit = {
-    log.severe(() => s"Committing XAResource for xid=${xid}, onePhase=${onePhase}, resource=${this}")
+    log.atTrace().addArgument(() => s"Committing XAResource for xid=${xid}, onePhase=${onePhase}, resource=${this}").log("{}")
 
     this.withWriteXaOperations(xid, ops => {
       if (onePhase && (ops.status eq Status.ENDED) || (ops.status eq Status.PREPARED)) {
@@ -111,7 +112,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def end(xid: Xid, flags: Int): Unit = {
-    log.severe(() => s"Ending XAResource xid=${xid}, resource=${this}")
+    log.atTrace().addArgument(() => s"Ending XAResource xid=${xid}, resource=${this}").log("{}")
 
     this.withWriteXaOperations(xid, ops => {
       if (ops.status eq Status.STARTED) {
@@ -123,13 +124,13 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def forget(xid: Xid): Unit = {
-    log.severe(() => s"forget(${xid}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"forget(${xid}) is called for resource=${this}").log("{}")
 
     throw new XaException(s"Heuristic commit/rollback not supported. forget xid=${xid}, resource=${this}", XAException.XAER_NOTA)
   }
 
   override def getTransactionTimeout: Int = {
-    log.severe(() => s"getTransactionTimeout() is called for resource=${this}")
+    log.atTrace().addArgument(() => s"getTransactionTimeout() is called for resource=${this}").log("{}")
 
     this.checkClosed()
 
@@ -137,7 +138,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def isSameRM(xares: XAResource): Boolean = {
-    log.severe(() => s"isSameRM(${xares}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"isSameRM(${xares}) is called for resource=${this}").log("{}")
 
     this.checkClosed()
 
@@ -145,7 +146,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def prepare(xid: Xid): Int = {
-    log.severe(() => s"prepare(${xid}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"prepare(${xid}) is called for resource=${this}").log("{}")
 
     this.withWriteXaOperations(xid, ops => {
       ops.status = Status.PREPARED
@@ -155,7 +156,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def recover(flag: Int): Array[Xid] = {
-    log.severe(() => s"recover(${flag}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"recover(${flag}) is called for resource=${this}").log("{}")
 
     if (flag != XAResource.TMSTARTRSCAN
       && flag != XAResource.TMENDRSCAN
@@ -184,7 +185,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def rollback(xid: Xid): Unit = {
-    log.severe(() => s"rollback($xid) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"rollback($xid) is called for resource=${this}").log("{}")
 
     this.withWriteXaOperations(xid, ops => {
       ops.status = ROLLING_BACK
@@ -193,13 +194,13 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
   }
 
   override def setTransactionTimeout(seconds: Int): Boolean = {
-    log.severe(() => s"setTransactionTimeout(${seconds}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"setTransactionTimeout(${seconds}) is called for resource=${this}").log("{}")
 
     false
   }
 
   override def start(xid: Xid, flags: Int): Unit = {
-    log.severe(() => s"start(${xid}, ${flags}) is called for resource=${this}")
+    log.atTrace().addArgument(() => s"start(${xid}, ${flags}) is called for resource=${this}").log("{}")
 
     if (flags != XAResource.TMNOFLAGS
       && flags != XAResource.TMRESUME
@@ -230,13 +231,13 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
 
     try {
       if (!this.isClosed) {
-        log.info(() => s"Close resource ${this}")
+        log.info(s"Close resource ${this}")
 
         this.thread.interrupt()
         this.map.clear()
         this.isClosed = true
       } else {
-        log.info(() => s"XAResource ${this} already closed")
+        log.info(s"XAResource ${this} already closed")
       }
     } finally {
       this.writeLock.unlock()
@@ -317,7 +318,7 @@ private class SimpleXaResource private(val space: SimpleSpace) extends XAResourc
 }
 
 private object SimpleXaResource {
-  private val log = Logger.getLogger(classOf[SimpleXaResource].getName)
+  private val log = LoggerFactory.getLogger(classOf[SimpleXaResource])
 
   private val cleanup_intermal_millilseconds = 3000
 

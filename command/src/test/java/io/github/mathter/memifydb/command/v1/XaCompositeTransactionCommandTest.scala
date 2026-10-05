@@ -27,7 +27,7 @@ import scala.util.Using
 class XaCompositeTransactionCommandTest {
   val provider: SerizationFactoryProvider = SerizationFactoryProvider.apply(Const.id)
 
-  val factory: CommandSerizationFactoryV1 = this.provider.instance().asInstanceOf[CommandSerizationFactoryV1]
+  val factory: SerializationFactoryV1 = this.provider.instance().asInstanceOf[SerializationFactoryV1]
 
   @Test
   def test(): Unit = {

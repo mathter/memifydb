@@ -22,9 +22,9 @@ import scala.jdk.CollectionConverters.given
 trait SerizationFactoryProvider {
   def id: String
 
-  def instance(): CommandSerizationFactory = this.instance(null)
+  def instance(): SerializationFactory = this.instance(null)
 
-  def instance(properties: Map[Any, Any]): CommandSerizationFactory
+  def instance(properties: Map[Any, Any]): SerializationFactory
 }
 
 
