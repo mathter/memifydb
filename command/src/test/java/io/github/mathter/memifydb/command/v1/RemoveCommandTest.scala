@@ -30,11 +30,11 @@ class RemoveCommandTest {
 
   @Test
   def test(): Unit = {
-    val spaceName = this.factory.valueSerelizationFactory.serializer
+    val spaceName = this.factory.valueSerializationFactory.serializer
       .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val key = this.factory.valueSerelizationFactory.serializer
+    val key = this.factory.valueSerializationFactory.serializer
       .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val value = this.factory.valueSerelizationFactory.serializer
+    val value = this.factory.valueSerializationFactory.serializer
       .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
     val cmd = new GetCommand(
       Sequence(RandomUtils.insecure().randomLong()),

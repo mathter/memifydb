@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.data.cbor.fasterxml
 
-import io.github.mathter.memifydb.common.data.{Value, ValueSerelizationFactory}
+import io.github.mathter.memifydb.common.data.{Value, ValueSerializationFactory}
 import org.junit.jupiter.api.{Assertions, Test}
 
 /**
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.{Assertions, Test}
 class ValueSerializationFactoryTest {
   @Test
   def test = {
-    val serializationFactory = ValueSerelizationFactory(FasterXmlValueSerializationFactory.id)
+    val serializationFactory = ValueSerializationFactory(FasterXmlValueSerializationFactory.id)
     val serializer = serializationFactory.serializer
     val deserializer = serializationFactory.deserializer
 

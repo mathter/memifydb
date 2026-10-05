@@ -72,6 +72,13 @@ private class DeserializerV1(private val valueDeserializer: ValueDeserializer) e
         )
       }
 
+      case SpaceInfoCommand.prefix => {
+        new SpaceInfoCommand(
+          IOUtil.readSequence,
+          new String(IOUtil.readArray, StandardCharsets.UTF_8)
+        )
+      }
+
       case XaCommitTransactionCommand.prefix => {
         new XaCommitTransactionCommand(
           IOUtil.readSequence,

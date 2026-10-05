@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.space
 
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.transaction.xa.XaResourceProvider
 
 import java.util.UUID
@@ -31,4 +32,6 @@ trait Space[O <: Operations] {
   def operations: O
 
   def xaResource: XaResourceProvider[O]
+
+  def valueSerializationFactory: ValueSerializationFactory
 }

@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.space.simple
 
-import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.space.{KeyValueOperations, Space, SpaceFactory}
 import io.github.mathter.memifydb.transaction.xa.{XaException, Xid}
 import org.apache.commons.lang3.RandomStringUtils
@@ -29,7 +29,7 @@ import javax.transaction.xa.XAResource
 class XaSimpleSpaceTest {
   private val spaceName = RandomStringUtils.insecure().nextAlphabetic(10)
 
-  private val valueSerelizationFactory = ValueSerelizationFactory("cbor.fasterxml")
+  private val valueSerelizationFactory = ValueSerializationFactory("cbor.fasterxml")
 
   private val space = SpaceFactory(Const.id).instance(spaceName, Map(Const.propertyTransactionTimeout -> Int.MaxValue)).asInstanceOf[Space[KeyValueOperations]]
 

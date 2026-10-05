@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.space.simple
 
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.space.{Operations, Space, SpaceFactory}
 
 import java.util.{Objects, UUID}
@@ -27,7 +28,8 @@ class SimpleSpaceFactory extends SpaceFactory {
     new SimpleSpace(
       this.buildId(properties),
       Objects.requireNonNull(name, "'name' parameter can't be null!"),
-      this.buildTransactionTimeout(properties)
+      this.buildTransactionTimeout(properties),
+      this.buildValueSerializationFactory(properties)
     ).asInstanceOf[T]
 
   private def buildId(properties: Map[Any, Any]): UUID = {
@@ -41,6 +43,19 @@ class SimpleSpaceFactory extends SpaceFactory {
         .getOrElse(UUID.randomUUID())
     } else {
       UUID.randomUUID()
+    }
+  }
+
+  private def buildValueSerializationFactory(properties: Map[Any, Any]): ValueSerializationFactory = {
+    if (properties != null) {
+      properties.get(Const.propertyValueSerializationFactory)
+        .map {
+          case x: String => ValueSerializationFactory(x)
+          case x: ValueSerializationFactory => x
+        }
+        .getOrElse(ValueSerializationFactory("cbor.fasterxml"))
+    } else {
+      ValueSerializationFactory("cbor.fasterxml")
     }
   }
 

@@ -1,5 +1,7 @@
 package io.github.mathter.memifydb.space.simple
 
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
+
 /**
  * Copyright 2026 Alexander Kashirsky (mathter)
  * <p>
@@ -24,4 +26,8 @@ object Const {
   val propertyTransactionTimeout = "transaction-timeout"
 
   val defaultTimeOut = 60
+
+  val propertyValueSerializationFactory="value-serialization-factory"
+
+  val defaultValueSerializationFactory = "cbor.fasterxml"
 }

@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.space.simple
 
-import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.data.cbor.fasterxml.FasterXmlValueSerializationFactory
 import io.github.mathter.memifydb.space.{KeyValueOperations, Space, SpaceFactory}
 import org.apache.commons.lang3.{RandomStringUtils, RandomUtils}
@@ -28,7 +28,7 @@ object LoadTest {
   val count = 1_000_000
 
   def main(args: Array[String]): Unit = {
-    val valueFactory = ValueSerelizationFactory.apply(FasterXmlValueSerializationFactory.id)
+    val valueFactory = ValueSerializationFactory.apply(FasterXmlValueSerializationFactory.id)
     val space: Space[KeyValueOperations] = SpaceFactory.apply(Const.id).instance(RandomStringUtils.insecure().nextAlphabetic(10))
     val ops = space.asInstanceOf[Space[KeyValueOperations]].operations
     val keys = (0 to threadCount * count)

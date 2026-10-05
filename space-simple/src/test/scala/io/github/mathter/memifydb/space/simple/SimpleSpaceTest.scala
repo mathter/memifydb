@@ -1,6 +1,6 @@
 package io.github.mathter.memifydb.space.simple
 
-import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.space.{KeyValueOperations, Space, SpaceFactory}
 import org.apache.commons.lang3.RandomStringUtils
 import org.junit.jupiter.api.{Assertions, BeforeEach, Test}
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.{Assertions, BeforeEach, Test}
 class SimpleSpaceTest {
   private val spaceName = RandomStringUtils.insecure().nextAlphabetic(10)
 
-  private val valueSerelizationFactory = ValueSerelizationFactory("cbor.fasterxml")
+  private val valueSerelizationFactory = ValueSerializationFactory("cbor.fasterxml")
 
   private val spaceFactory = SpaceFactory(Const.id)
 

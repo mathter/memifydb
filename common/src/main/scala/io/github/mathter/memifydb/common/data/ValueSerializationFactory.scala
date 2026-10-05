@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters.given
  * The class is factory of instances of the serilizer, deseralizer any type objects
  * to and from a byte array, as well as java objects
  */
-trait ValueSerelizationFactory {
+trait ValueSerializationFactory {
   /**
    *
    * @return
@@ -33,13 +33,13 @@ trait ValueSerelizationFactory {
   def deserializer: ValueDeserializer
 }
 
-object ValueSerelizationFactory {
-  def apply(id: String): ValueSerelizationFactory = {
-    val serviceLoader = ServiceLoader.load(classOf[ValueSerelizationFactory])
+object ValueSerializationFactory {
+  def apply(id: String): ValueSerializationFactory = {
+    val serviceLoader = ServiceLoader.load(classOf[ValueSerializationFactory])
 
     serviceLoader.asScala.find(e => id == e.id)
-      .getOrElse(
-        throw new IllegalStateException(s"There is no ValueSerelizationFactory with id='${id}'!")
-      )
+       .getOrElse(
+         throw new IllegalStateException(s"There is no ValueSerializationFactory with id='${id}'!")
+       )
   }
 }

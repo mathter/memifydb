@@ -59,6 +59,11 @@ private class SerializerV1 extends Serializer {
         true
       }
 
+      case x: SpaceInfoCommand => {
+        IOUtil.write(x.serializationProtocol.getBytes(StandardCharsets.UTF_8))
+        true
+      }
+
       case x: XaCommitTransactionCommand => {
         IOUtil.write(x.xid)
         IOUtil.write(x.onePhase)

@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.command.v1
 
 import io.github.mathter.memifydb.command.{Sequence, SerizationFactoryProvider}
-import org.apache.commons.lang3.{RandomStringUtils, RandomUtils}
+import org.apache.commons.lang3.{RandomUtils}
 import org.junit.jupiter.api.{Assertions, Test}
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
@@ -23,32 +23,29 @@ import scala.util.Using
  * limitations under the License.
  *
  */
-class ValueResultTest {
+class SpaceInfoCommandTest {
   val provider = SerizationFactoryProvider.apply(Const.id)
 
   val factory = this.provider.instance().asInstanceOf[SerializationFactoryV1]
 
   @Test
   def test(): Unit = {
-    val value = this.factory.valueSerializationFactory.serializer
-      .serialize(RandomStringUtils.insecure().nextAlphabetic(10))
-    val result = new ValueResult(Sequence(RandomUtils.insecure().randomLong()), value)
+    val cmd = new SpaceInfoCommand(Sequence(RandomUtils.insecure().randomLong()), "cbor")
 
-    val deserializedResult = Using(new ByteArrayOutputStream()) {
+    val deserializedCmd = Using(new ByteArrayOutputStream()) {
       os =>
-        factory.serializer.serialize(os, result)
+        factory.serializer.serialize(os, cmd)
         os.toByteArray
     }.flatMap {
         a =>
           Using(new ByteArrayInputStream(a)) {
             is =>
-              this.factory.deserializer.deserialize[ValueResult[String]](is)
+              this.factory.deserializer.deserialize[SpaceInfoCommand](is)
           }
       }
       .get
-    val oa = result.value.raw
-    Assertions.assertNotNull(deserializedResult)
-    Assertions.assertEquals(result.sequence, deserializedResult.sequence)
-    Assertions.assertEquals(result.value, deserializedResult.value)
+    Assertions.assertNotNull(deserializedCmd)
+    Assertions.assertEquals(cmd.sequence, deserializedCmd.sequence)
+    Assertions.assertEquals(cmd.serializationProtocol, deserializedCmd.serializationProtocol)
   }
 }

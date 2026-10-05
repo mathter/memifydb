@@ -1,5 +1,6 @@
 package io.github.mathter.memifydb.space.simple
 
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.space.{KeyValueOperations, Space}
 import io.github.mathter.memifydb.transaction.xa.XaResourceProvider
 
@@ -25,6 +26,7 @@ private class SimpleSpace(
                            final val id: UUID,
                            final val name: String,
                            final val transactionTimeout: Int,
+                           final val valueSerializationFactory: ValueSerializationFactory,
                            final val ops: SimpleOperations = new SimpleOperations
                          )
   extends Space[KeyValueOperations] {
@@ -36,10 +38,11 @@ private class SimpleSpace(
 
   override def operations: SimpleOperations = ops
 
-  override def xaResource: XaResourceProvider[KeyValueOperations] =
+  override def xaResource: XaResourceProvider[KeyValueOperations] = {
     if (this.isClosed) {
       throw new IllegalStateException(s"Error while closing Space id=${this.id}, name=${this.name}")
     } else {
       this.xaRes
     }
+  }
 }

@@ -13,6 +13,7 @@ import org.mockito.stubbing.Answer
 import org.mockito.{ArgumentMatchers, InjectMocks, Mock, Mockito}
 
 import java.security.Principal
+import scala.collection.mutable
 import scala.compiletime.uninitialized
 
 @ExtendWith(Array(classOf[MockitoExtension]))
@@ -46,6 +47,8 @@ class NetworkCommandProcessorTest {
         override def getName: String = invocation.getArgument(0)
       }
     })
+    Mockito.when(this.context.params)
+      .thenReturn(mutable.Map.empty)
 
     val result = this.networkCommandProcessor.process(using this.context, sayHelloCommand)
     Assertions.assertNotNull(result)

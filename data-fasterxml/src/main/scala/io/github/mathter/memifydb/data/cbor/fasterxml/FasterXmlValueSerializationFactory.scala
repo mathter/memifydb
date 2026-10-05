@@ -1,7 +1,7 @@
 package io.github.mathter.memifydb.data.cbor.fasterxml
 
 import io.github.mathter.memifydb.common.data
-import io.github.mathter.memifydb.common.data.ValueSerelizationFactory
+import io.github.mathter.memifydb.common.data.ValueSerializationFactory
 import io.github.mathter.memifydb.data.cbor.fasterxml.FasterXmlValueSerializationFactory.{valueDeserializer, valueSerializer}
 import tools.jackson.databind.ObjectMapper
 /**
@@ -20,7 +20,7 @@ import tools.jackson.databind.ObjectMapper
  * limitations under the License.
  * <p>
  */
-class FasterXmlValueSerializationFactory extends ValueSerelizationFactory {
+class FasterXmlValueSerializationFactory extends ValueSerializationFactory {
   override def id: String = FasterXmlValueSerializationFactory.id
 
   override def serializer: data.ValueSerializer = valueSerializer
